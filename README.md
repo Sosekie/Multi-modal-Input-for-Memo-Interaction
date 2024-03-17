@@ -4,8 +4,8 @@
 
 ### Choosing Linux:
 
-Using WSL and Ubuntu is a good choice.\
-How to set up WSL: https://learn.microsoft.com/en-us/windows/wsl/install\
+Using WSL and Ubuntu is a good choice.\\
+How to set up WSL: https://learn.microsoft.com/en-us/windows/wsl/install\\
 How to set up Ubuntu: https://maurogiusti.medium.com/running-ubuntu-on-windows-10-with-wsl2-c4f06b3c353
 
 ### Create env:
