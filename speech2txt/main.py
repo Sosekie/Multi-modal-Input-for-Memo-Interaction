@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 from datasets import load_dataset
-import time
+from datetime import datetime
 
 def model_initialize():
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -37,15 +37,26 @@ def model_initialize():
         device=device,
     )
 
-def speech2txt(sample):
+    return pipe
+
+def speech2txt(pipe, sample):
 
     result = pipe(sample,
                 # optional:
                 generate_kwargs={
-                    # "language": "english",
+                    "language": "english",
                     #   "task": "translate"
                     },
                 )
     print(result["text"])
 
-speech2txt(sample = './speech2txt/Recording/Recording_2.mp3')
+
+if __name__ == "__main__":
+
+    pipe = model_initialize()
+
+    for i in range(5):
+        start_time = datetime.now()
+        speech2txt(pipe, sample = './speech2txt/Recording/Recording_1.mp3')
+        end_time = datetime.now()
+        print(f"excute time：{(end_time - start_time).total_seconds()} seconds")
