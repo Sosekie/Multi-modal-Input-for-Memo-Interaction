@@ -4,6 +4,7 @@
 
 ### Choosing Linux:
 
+Linux is more faster than Windows when doing inference(140%).\
 Using WSL and Ubuntu is a good choice.\
 How to set up WSL: https://learn.microsoft.com/en-us/windows/wsl/install
 \
