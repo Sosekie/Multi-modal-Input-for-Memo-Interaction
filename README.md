@@ -26,6 +26,8 @@ How to set up Ubuntu: https://maurogiusti.medium.com/running-ubuntu-on-windows-1
 
 `pip install --upgrade git+https://github.com/huggingface/transformers.git accelerate datasets[audio]`
 
+`pip install pyaudio`
+
 if ffmpeg does not exist:
 
 `sudo apt update`
