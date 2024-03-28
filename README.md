@@ -10,6 +10,8 @@ Priority:
 
 ## Environment
 
+Windows, Anaconda
+
 ### Create env:
 
 `conda create --name mmui`
@@ -28,9 +30,13 @@ Priority:
 
 3. pip install pyaudio
 
-if ffmpeg does not exist:
+##### Install ffmpeg on windows:
 
-
+1. Open Powershell as Administrator
+2. Install Chocolatey(if not exist):
+`Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
+3. Install ffmpeg in mmui:
+`choco install ffmpeg`
 
 #### For gesture:
 
