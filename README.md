@@ -1,5 +1,13 @@
 # MMUI_project
 
+## Next steps:
+
+Priority:
+1) Implement Merge speech recognition, speech trigger.
+2) Implement a Virtual Memo from the Speech (create a new memo).
+3) Catch the memo by the gesture 
+4) Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
+
 ## Environment
 
 ### Create env:
