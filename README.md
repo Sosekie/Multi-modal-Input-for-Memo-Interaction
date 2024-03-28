@@ -38,6 +38,10 @@ and verifiy installation:
 
 `ffmpeg -version`
 
+#### For gesture:
+
+`pip3 install opencv-python numpy jupyter mediapipe`
+
 ## Run:
 
 Run speech2txt demo:
