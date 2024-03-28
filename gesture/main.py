@@ -100,16 +100,7 @@ def highlight_memo(frame, memo):
     else:
         cv2.rectangle(frame, (0,0), (memo.size+10, memo.size+10), (0, 255, 255), -1)
     
-
-def test_1(memo1, memo2):
-
-    # memo2.merge(memo1)
-
-    # show memos
-    cv2.imshow("memo1", memo1.get_pic())
-    cv2.imshow("memo2", memo2.get_pic())
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+def detector_init():
 
     base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
     options = vision.HandLandmarkerOptions(base_options=base_options,
@@ -119,6 +110,17 @@ def test_1(memo1, memo2):
     detector = vision.HandLandmarker.create_from_options(options)
 
     return detector
+
+
+def test_1(memo1, memo2):
+
+    memo1.merge(memo2)
+
+    # show memos
+    cv2.imshow("memo1", memo1.get_pic())
+    cv2.imshow("memo2", memo2.get_pic())
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 def test_2(memo1, memo2, detector):
     # use the camera
@@ -165,6 +167,8 @@ if __name__ == "__main__":
     memo1 = Memo([200, 30, 30], "A", side="left")
     memo2 = Memo([30, 30, 200], "B", side="right")
 
-    detector = test_1(memo1, memo2)
+    test_1(memo1, memo2)
 
-    test_2(memo1, memo2, detector)
+    # detector = detector_init()
+
+    # test_2(memo1, memo2, detector)

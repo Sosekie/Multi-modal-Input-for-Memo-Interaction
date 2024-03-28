@@ -2,14 +2,6 @@
 
 ## Environment
 
-### Choosing Linux:
-
-Linux is more faster than Windows when doing inference(140%).\
-Using WSL and Ubuntu is a good choice.\
-How to set up WSL: https://learn.microsoft.com/en-us/windows/wsl/install
-\
-How to set up Ubuntu: https://maurogiusti.medium.com/running-ubuntu-on-windows-10-with-wsl2-c4f06b3c353
-
 ### Create env:
 
 `conda create --name mmui`
@@ -22,21 +14,15 @@ How to set up Ubuntu: https://maurogiusti.medium.com/running-ubuntu-on-windows-1
 
 #### For speech2txt:
 
-`pip install --upgrade pip`
+1. pip install --upgrade pip
 
-`pip install --upgrade git+https://github.com/huggingface/transformers.git accelerate datasets[audio]`
+2. pip install --upgrade git+https://github.com/huggingface/transformers.git accelerate datasets[audio]
 
-`pip install pyaudio`
+3. pip install pyaudio
 
 if ffmpeg does not exist:
 
-`sudo apt update`
 
-`sudo apt install ffmpeg`
-
-and verifiy installation:
-
-`ffmpeg -version`
 
 #### For gesture:
 
@@ -47,3 +33,7 @@ and verifiy installation:
 Run speech2txt demo:
 
 `python speech2txt/main.py`
+
+Run gesture demo:
+
+`python gesture/main.py`
