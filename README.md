@@ -3,10 +3,14 @@
 ## Next steps:
 
 Priority:
-1) Implement Merge speech recognition, speech trigger.
-2) Implement a Virtual Memo from the Speech (create a new memo).
-3) Catch the memo by the gesture 
-4) Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
+
+- Implement Merge speech recognition, speech trigger.
+
+- Implement a Virtual Memo from the Speech (create a new memo).
+
+- Catch the memo by the gesture 
+
+- Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
 
 ## Environment
 
@@ -24,18 +28,22 @@ Windows, Anaconda
 
 #### For speech2txt:
 
-1. pip install --upgrade pip
+- Open Powershell as Administrator
 
-2. pip install --upgrade git+https://github.com/huggingface/transformers.git accelerate datasets[audio]
+- Install Chocolatey(if not exist):
+`Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
 
-3. pip install pyaudio
+- choco install git -y (if not exist)
+
+- pip install --upgrade pip
+
+- pip install --upgrade git+https://github.com/huggingface/transformers.git accelerate datasets[audio]
+
+- pip install pyaudio
 
 ##### Install ffmpeg on windows:
 
-1. Open Powershell as Administrator
-2. Install Chocolatey(if not exist):
-`Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
-3. Install ffmpeg in mmui:
+- Install ffmpeg in mmui:
 `choco install ffmpeg`
 
 #### For gesture:
@@ -44,10 +52,10 @@ Windows, Anaconda
 
 ## Run:
 
-Run speech2txt demo:
+- Run speech2txt demo:
 
 `python speech2txt/main.py`
 
-Run gesture demo:
+- Run gesture demo:
 
 `python gesture/main.py`
