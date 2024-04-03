@@ -167,8 +167,8 @@ if __name__ == "__main__":
     memo1 = Memo([200, 30, 30], "A", side="left")
     memo2 = Memo([30, 30, 200], "B", side="right")
 
-    test_1(memo1, memo2)
+    # test_1(memo1, memo2)
 
-    # detector = detector_init()
+    detector = detector_init()
 
-    # test_2(memo1, memo2, detector)
+    test_2(memo1, memo2, detector)
