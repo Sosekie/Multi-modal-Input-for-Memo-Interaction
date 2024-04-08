@@ -59,6 +59,7 @@ class Memo:
             for landmark in hand_landmarks:
                 if abs(self.side-landmark.x)*frame.shape[1]<=self.size and landmark.y*frame.shape[0]<=self.size:
                     return True
+        return False
     
     def is_ok_gesture(hand_landmarks_list, threshold=10):
         """
@@ -86,8 +87,9 @@ class Memo:
                     curled = False
                     break
             return curled
+        else:
+            return False
 
-        return False
     
 def draw_landmarks_on_image(rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
