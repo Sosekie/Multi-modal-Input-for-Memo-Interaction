@@ -84,7 +84,7 @@ class Memo:
             thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
             # Threshold = 0.15
             if thumb_tip_distance <= threshold:
-                return thumb_tip_distance
+                return True
         
         # No hands or landmarks in the touch area
         return False
