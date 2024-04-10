@@ -1,38 +1,32 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+from random import randint
 from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-MARGIN = 10  # pixels
-FONT_SIZE = 1
-FONT_THICKNESS = 1
-HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
+COLOR_NUM = 20
+COLOR_MAP = plt.cm.get_cmap('tab20', COLOR_NUM)
 
 class Memo:
-    def __init__(self, color, content, side, size=100):
-        if side == "right":
-            self.side = 1
-        else:
-            self.side = 0
-        
-        self.position_x = 0
-        self.position_y = 0
+    def __init__(self, position, content, size=100):
+        self.position = position    # position = [x, y]
 
-        self.color = np.array(color, dtype=np.uint8)
+        rand_color = np.array(COLOR_MAP(randint(0, COLOR_NUM-1))[:3]) * 255
+        self.color = rand_color.astype(np.uint8)
         self.content = content
         self.size = int(size)
         
         self.pic = np.zeros((self.size, self.size, 3), dtype=np.uint8)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.font_scale = 1.5
+        self.font_scale = 1
         self.font_color = (255, 255, 255)  # 白色
         self.font_thickness = 2
 
-        if size:
-            self.update_pic()
+        self.update_pic()
 
     def update_pic(self):
         picture = np.broadcast_to(self.color, (self.size, self.size, 3))
@@ -61,33 +55,14 @@ class Memo:
         for idx in range(len(hand_landmarks_list)):
             hand_landmarks = hand_landmarks_list[idx]
             for landmark in hand_landmarks:
-                if abs(self.side-landmark.x)*frame.shape[1]<=self.size and landmark.y*frame.shape[0]<=self.size:
+                if (self.position[0] <= landmark.x*frame.shape[1] <= self.position[0]+self.size and
+                        self.position[1] <= landmark.y*frame.shape[0] <= self.position[1]+self.size):
                     return True
         return False
-    
-    def handle_pinch(self, detection_result, frame):
-        # Check for pinch gesture using is_pinched function
-        thumb_tip_distance = self.is_pinched(detection_result, frame)
-        if thumb_tip_distance is not None:
-        # Pinch detected, calculate movement based on distance (optional)
-        # You can implement logic here to move the memo based on the calculated
-        # distance (thumb_tip_distance) in the is_pinched function. For example,
-        # a larger distance could correspond to a larger movement.
-            # x, y, w, h = cv2.boundingRect(frame)  # x, y are top-left corner coordinates
-            self.move(thumb_tip_distance)  # Call a new function to move the memo
 
-
-    # Add a new function to handle movement (pseudocode)
-    def move(self, distance):
-        # Update memo position based on distance and side (consider damping for smoothness)
-        new_x = self.position_x + (distance * (1 if self.side == 1 else -1))
-        new_y = self.position_y  # You can add vertical movement if needed
-        self.update_position(new_x, new_y)
-
-    # Update position function (assuming you have position attributes)
-    def update_position(self, new_x, new_y):
-        self.position_x = new_x
-        self.position_y = new_y
+    # Update position function
+    def update_position(self, new_pos):
+        self.position = new_pos
 
 
 def is_pinched(detection_result):
@@ -98,32 +73,13 @@ def is_pinched(detection_result):
         # Both landmarks are in the touch area, calculate distance
         thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
         thumb_tip_middle_distance = abs(hand_landmarks[6].x - hand_landmarks[3].x) + abs(hand_landmarks[6].y - hand_landmarks[3].y)
-        if 2*thumb_tip_distance <= thumb_tip_middle_distance:
+        if thumb_tip_distance < thumb_tip_middle_distance:
             position = [hand_landmarks[4].x, hand_landmarks[4].y]
             return position
     # No hands or landmarks in the touch area
-    return False
-    
-
-def is_catched(self, detection_result, frame):
-    hand_landmarks_list = detection_result.hand_landmarks
-    
-    thumb_tip = hand_landmarks_list[solutions.hands.HandLandmark.THUMB_TIP]
-    index_tip = hand_landmarks_list[solutions.hands.HandLandmark.INDEX_FINGER_TIP]
-    threshold = 10
-    for idx in range(len(hand_landmarks_list)):
-        hand_landmarks = hand_landmarks_list[idx]
-        # Check distance between thumb and index finger
-        distance = abs(thumb_tip.x - index_tip.x)*frame.shape[1] + abs(thumb_tip.y - index_tip.y)*frame.shape[0]
-        while distance < threshold :
-            # calculate whether the location of the landmark is inside the memo area
-            # if there’s a landmark inside the area of this memo, return true
-            if abs(self.side-thumb_tip.x)*frame.shape[1]<=self.size and thumb_tip.y*frame.shape[0]<=self.size:
-                return True
-    return False
+    return []
 
 
-    
 def draw_landmarks_on_image(rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
     handedness_list = detection_result.handedness
@@ -148,19 +104,27 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
     return annotated_image
 
-def add_memo(frame, memo):
-    if memo.side:
-        frame[:memo.size, -memo.size:, :] = memo.get_pic()
-    else:
-        frame[:memo.size, :memo.size, :] = memo.get_pic()
+def add_memo(frame, memo_list):
+    for memo in memo_list:
+        memo_pic = memo.get_pic()
+        memo_right = min(memo.position[0]+memo.size, frame.shape[1])
+        memo_bottom = min(memo.position[1]+memo.size, frame.shape[0])
+
+        memo_pic = memo_pic[:memo_bottom - memo.position[1], :memo_right - memo.position[0]]
+        frame[memo.position[1]: memo_bottom, memo.position[0]: memo_right] = memo_pic
 
     return frame
 
-def highlight_memo(frame, memo):
-    if memo.side:
-        cv2.rectangle(frame, (frame.shape[1]-memo.size-10,0), (frame.shape[1], memo.size+10), (0, 255, 255), -1)
-    else:
-        cv2.rectangle(frame, (0,0), (memo.size+10, memo.size+10), (0, 255, 255), -1)
+def highlight_memo(frame, triggered_memo_list):
+    for memo in triggered_memo_list:
+        highlight_left = max(memo.position[0] - 10, 0)
+        highlight_right = min(memo.position[0] + memo.size + 10, frame.shape[1])
+        highlight_top = max(memo.position[1] - 10, 0)
+        highlight_bottom = min(memo.position[1] + memo.size + 10, frame.shape[0])
+
+        cv2.rectangle(frame, (highlight_left, highlight_top), (highlight_right, highlight_bottom), (0, 255, 255), -1)
+
+    return frame
     
 def detector_init():
 
