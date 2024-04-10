@@ -18,6 +18,9 @@ class Memo:
         else:
             self.side = 0
         
+        self.position_x = 0
+        self.position_y = 0
+
         self.color = np.array(color, dtype=np.uint8)
         self.content = content
         self.size = int(size)
@@ -61,34 +64,71 @@ class Memo:
                     return True
         return False
     
-    def is_ok_gesture(hand_landmarks_list, threshold=10):
-        """
-        Checks if the provided hand landmarks correspond to the "OK" gesture.
+    def is_pinched(self, detection_result, frame):
+        thumb_tip_distance = None
+        hand_landmarks_list = detection_result.hand_landmarks
 
-        Args:
-            hand_landmarks_list: A list of 21 hand landmark data points obtained from MediaPipe.
-            threshold: The distance threshold between thumb and index finger for touch detection.
+        for idx_hand, hand_landmarks in enumerate(hand_landmarks_list):
+            # Check if thumb tip is in the touch area
+            if not (abs(self.side - hand_landmarks[4].x) * frame.shape[1] <= self.size and
+                    hand_landmarks[4].y * frame.shape[0] <= self.size):
+                continue  # Skip to next hand if thumb not in touch area
 
-        Returns:
-            True if the hand is in the "OK" gesture, False otherwise.
-        """
-        # Access specific landmark coordinates
-        thumb_tip = hand_landmarks_list[mp.HandLandmark.THUMB_TIP]
-        index_tip = hand_landmarks_list[mp.HandLandmark.INDEX_FINGER_TIP]
-        other_fingers = hand_landmarks_list[mp.HandLandmark.INDEX_FINGER_DIP.value + 1 :]
+                # Check if index finger tip is in the touch area
+            if not (abs(self.side - hand_landmarks[8].x) * frame.shape[1] <= self.size and
+                    hand_landmarks[8].y * frame.shape[0] <= self.size):
+                continue  # Skip to next hand if index finger not in touch area
 
+            # Both landmarks are in the touch area, calculate distance
+            thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
+            # Implement further logic based on thumb_tip_distance (pinch detection)
+            return thumb_tip_distance
+        
+        # No hands or landmarks in the touch area
+        return False
+    
+    def handle_pinch(self, detection_result, frame):
+        # Check for pinch gesture using is_pinched function
+        thumb_tip_distance = self.is_pinched(detection_result, frame)
+        if thumb_tip_distance is not None:
+        # Pinch detected, calculate movement based on distance (optional)
+        # You can implement logic here to move the memo based on the calculated
+        # distance (thumb_tip_distance) in the is_pinched function. For example,
+        # a larger distance could correspond to a larger movement.
+            # x, y, w, h = cv2.boundingRect(frame)  # x, y are top-left corner coordinates
+            self.move(thumb_tip_distance)  # Call a new function to move the memo
+
+
+    # Add a new function to handle movement (pseudocode)
+    def move(self, distance):
+        # Update memo position based on distance and side (consider damping for smoothness)
+        new_x = self.position_x + (distance * (1 if self.side == 1 else -1))
+        new_y = self.position_y  # You can add vertical movement if needed
+        self.update_position(new_x, new_y)
+
+    # Update position function (assuming you have position attributes)
+    def update_position(self, new_x, new_y):
+        self.position_x = new_x
+        self.position_y = new_y
+
+
+def is_catched(self, detection_result, frame):
+    hand_landmarks_list = detection_result.hand_landmarks
+    
+    thumb_tip = hand_landmarks_list[solutions.hands.HandLandmark.THUMB_TIP]
+    index_tip = hand_landmarks_list[solutions.hands.HandLandmark.INDEX_FINGER_TIP]
+    threshold = 10
+    for idx in range(len(hand_landmarks_list)):
+        hand_landmarks = hand_landmarks_list[idx]
         # Check distance between thumb and index finger
-        distance = abs(thumb_tip.x - index_tip.x) + abs(thumb_tip.y - index_tip.y)
-        if distance < threshold:
-            # Check if other fingers are curled
-            curled = True
-            for finger in other_fingers:
-                if finger.y > (thumb_tip.y + threshold):
-                    curled = False
-                    break
-            return curled
-        else:
-            return False
+        distance = abs(thumb_tip.x - index_tip.x)*frame.shape[1] + abs(thumb_tip.y - index_tip.y)*frame.shape[0]
+        while distance < threshold :
+            # calculate whether the location of the landmark is inside the memo area
+            # if there’s a landmark inside the area of this memo, return true
+            if abs(self.side-thumb_tip.x)*frame.shape[1]<=self.size and thumb_tip.y*frame.shape[0]<=self.size:
+                return True
+    return False
+
 
     
 def draw_landmarks_on_image(rgb_image, detection_result):
