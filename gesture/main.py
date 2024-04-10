@@ -109,4 +109,70 @@ def detector_init():
                                         num_hands=2)
     detector = vision.HandLandmarker.create_from_options(options)
 
+<<<<<<< Updated upstream
     return detector
+=======
+    return detector
+
+
+def test_1(memo1, memo2):
+
+    memo1.merge(memo2)
+
+    # show memos
+    cv2.imshow("memo1", memo1.get_pic())
+    cv2.imshow("memo2", memo2.get_pic())
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def test_2(memo1, memo2, detector):
+    # use the camera
+    cap = cv2.VideoCapture(0)
+
+    while True:
+        # capture the frame
+        ret, frame = cap.read()
+        
+        if ret:
+            frame = np.array(frame[:, ::-1, :], dtype=np.uint8)
+
+            # STEP 3: Load the input image.
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+
+            # STEP 4: Detect hand landmarks from the input image.
+            detection_result = detector.detect(mp_image)
+            
+            # STEP 5: Process the classification result. In this case, visualize it.
+            if detection_result:
+                frame = draw_landmarks_on_image(mp_image.numpy_view(), detection_result)
+                if memo1.is_triggered(detection_result, frame):
+                    highlight_memo(frame, memo1)
+                if memo2.is_triggered(detection_result, frame):
+                    highlight_memo(frame, memo2)
+
+            # add memos
+            frame = add_memo(frame, memo1)
+            frame = add_memo(frame, memo2)
+            
+            # show the frame
+            cv2.imshow("camera", frame)
+        
+        # press 'q' to exit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+    # release the camera
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    
+    memo1 = Memo([200, 30, 30], "A", side="left")
+    memo2 = Memo([30, 30, 200], "B", side="right")
+
+    # test_1(memo1, memo2)
+
+    detector = detector_init()
+
+    test_2(memo1, memo2, detector)
+>>>>>>> Stashed changes
