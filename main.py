@@ -71,6 +71,7 @@ def start(memo1, memo2, detector, audio_pipe):
                 if memo1.is_triggered(detection_result, frame):
                     highlight_memo(frame, memo1)
                     memo_1_detect = True
+                
                 if memo2.is_triggered(detection_result, frame):
                     highlight_memo(frame, memo2)
                     memo_2_detect = True
@@ -78,10 +79,18 @@ def start(memo1, memo2, detector, audio_pipe):
                 audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(memo1, memo2, memo_1_detect, memo_2_detect, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
                 # Create memo function
                 memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(audio_done_event_create, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_pipe)
+
+                if memo3.is_pinched(detection_result, frame):
+                    memo1.handle_pinch(detection_result, frame)
+                    highlight_memo(frame, memo1)
+                    memo_1_detect = True
+                    memo1.position_x = fingerp
+
             frame = add_memo(frame, memo1)
             if memo_new:
                 memo2 = memo_new
             frame = add_memo(frame, memo2)
+            frame = add_memo(frame, memo3)
             cv2.imshow("camera", frame)
         # press 'q' to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
