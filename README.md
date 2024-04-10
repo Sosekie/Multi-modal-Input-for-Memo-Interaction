@@ -1,4 +1,7 @@
 # MMUI_project
+## Already done:
+- Create the memo with the "pinch" gesture and say "Create".
+- Merge: point the 2 memo and say "Merge" to combine togheter on one unique memo.
 
 ## Next steps:
 
