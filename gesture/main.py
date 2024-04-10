@@ -59,8 +59,37 @@ class Memo:
             for landmark in hand_landmarks:
                 if abs(self.side-landmark.x)*frame.shape[1]<=self.size and landmark.y*frame.shape[0]<=self.size:
                     return True
-    
         return False
+    
+    def is_ok_gesture(hand_landmarks_list, threshold=10):
+        """
+        Checks if the provided hand landmarks correspond to the "OK" gesture.
+
+        Args:
+            hand_landmarks_list: A list of 21 hand landmark data points obtained from MediaPipe.
+            threshold: The distance threshold between thumb and index finger for touch detection.
+
+        Returns:
+            True if the hand is in the "OK" gesture, False otherwise.
+        """
+        # Access specific landmark coordinates
+        thumb_tip = hand_landmarks_list[mp.HandLandmark.THUMB_TIP]
+        index_tip = hand_landmarks_list[mp.HandLandmark.INDEX_FINGER_TIP]
+        other_fingers = hand_landmarks_list[mp.HandLandmark.INDEX_FINGER_DIP.value + 1 :]
+
+        # Check distance between thumb and index finger
+        distance = abs(thumb_tip.x - index_tip.x) + abs(thumb_tip.y - index_tip.y)
+        if distance < threshold:
+            # Check if other fingers are curled
+            curled = True
+            for finger in other_fingers:
+                if finger.y > (thumb_tip.y + threshold):
+                    curled = False
+                    break
+            return curled
+        else:
+            return False
+
     
 def draw_landmarks_on_image(rgb_image, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
