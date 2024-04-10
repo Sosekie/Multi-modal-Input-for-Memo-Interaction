@@ -31,7 +31,8 @@ class Memo:
         self.font_color = (255, 255, 255)  # 白色
         self.font_thickness = 2
 
-        self.update_pic()
+        if size:
+            self.update_pic()
 
     def update_pic(self):
         picture = np.broadcast_to(self.color, (self.size, self.size, 3))
@@ -64,31 +65,6 @@ class Memo:
                     return True
         return False
     
-    def is_pinched(self, detection_result, frame):
-        thumb_tip_distance = None
-        threshold = 0.15
-        hand_landmarks_list = detection_result.hand_landmarks
-
-        for idx_hand, hand_landmarks in enumerate(hand_landmarks_list):
-            # Check if thumb tip is in the touch area
-            if not (abs(self.side - hand_landmarks[4].x) * frame.shape[1] <= self.size and
-                    hand_landmarks[4].y * frame.shape[0] <= self.size):
-                continue  # Skip to next hand if thumb not in touch area
-
-                # Check if index finger tip is in the touch area
-            if not (abs(self.side - hand_landmarks[8].x) * frame.shape[1] <= self.size and
-                    hand_landmarks[8].y * frame.shape[0] <= self.size):
-                continue  # Skip to next hand if index finger not in touch area
-
-            # Both landmarks are in the touch area, calculate distance
-            thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
-            # Threshold = 0.15
-            if thumb_tip_distance <= threshold:
-                return True
-        
-        # No hands or landmarks in the touch area
-        return False
-    
     def handle_pinch(self, detection_result, frame):
         # Check for pinch gesture using is_pinched function
         thumb_tip_distance = self.is_pinched(detection_result, frame)
@@ -113,6 +89,21 @@ class Memo:
         self.position_x = new_x
         self.position_y = new_y
 
+
+def is_pinched(detection_result):
+    thumb_tip_distance = None
+    hand_landmarks_list = detection_result.hand_landmarks
+
+    for idx_hand, hand_landmarks in enumerate(hand_landmarks_list):
+        # Both landmarks are in the touch area, calculate distance
+        thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
+        thumb_tip_middle_distance = abs(hand_landmarks[6].x - hand_landmarks[3].x) + abs(hand_landmarks[6].y - hand_landmarks[3].y)
+        if 2*thumb_tip_distance <= thumb_tip_middle_distance:
+            position = [hand_landmarks[4].x, hand_landmarks[4].y]
+            return position
+    # No hands or landmarks in the touch area
+    return False
+    
 
 def is_catched(self, detection_result, frame):
     hand_landmarks_list = detection_result.hand_landmarks

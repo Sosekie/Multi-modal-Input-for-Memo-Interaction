@@ -81,15 +81,11 @@ def start(memo1, memo2, detector, audio_pipe):
                 
                 # Create memo function
                 memo_new = None
-                if create_flag:
-                    # position = # get position here,
+                position = is_pinched(detection_result)
+                if position:
+                    print('position: ', position)
                     memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(position, audio_done_event_create, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_pipe)
 
-                # if memo3.is_pinched(detection_result, frame):
-                #     memo1.handle_pinch(detection_result, frame)
-                #     highlight_memo(frame, memo1)
-                #     memo_1_detect = True
-                #     memo1.position_x = fingerp
 
             frame = add_memo(frame, memo1)
             frame = add_memo(frame, memo2)
