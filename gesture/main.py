@@ -66,6 +66,7 @@ class Memo:
     
     def is_pinched(self, detection_result, frame):
         thumb_tip_distance = None
+        threshold = 0.15
         hand_landmarks_list = detection_result.hand_landmarks
 
         for idx_hand, hand_landmarks in enumerate(hand_landmarks_list):
@@ -81,8 +82,9 @@ class Memo:
 
             # Both landmarks are in the touch area, calculate distance
             thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
-            # Implement further logic based on thumb_tip_distance (pinch detection)
-            return thumb_tip_distance
+            # Threshold = 0.15
+            if thumb_tip_distance <= threshold:
+                return thumb_tip_distance
         
         # No hands or landmarks in the touch area
         return False
@@ -173,8 +175,8 @@ def detector_init():
 
     base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
     options = vision.HandLandmarkerOptions(base_options=base_options,
-                                        min_hand_detection_confidence=0.4,
-                                        min_hand_presence_confidence=0.3,
+                                        min_hand_detection_confidence=0.2,
+                                        min_hand_presence_confidence=0.9,
                                         num_hands=2)
     detector = vision.HandLandmarker.create_from_options(options)
 
