@@ -24,7 +24,7 @@ def audio_trigger_create(pipe, result_queue, done_event):
     text = speech2txt(pipe, sample=byte_io.read())
     print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
     print('text: ', text)
-    if "c" in text.lower():
+    if "c" in text.lower() or "t" in text.lower():
         result_queue.put(True)
         print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
     result_queue.put(False)
