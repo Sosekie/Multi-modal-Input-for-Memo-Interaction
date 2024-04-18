@@ -77,6 +77,12 @@ def start(memo_list, detector, audio_pipe):
                 if len(triggered_memo_list) == 2:
                     audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
                 
+                # Catch and move memo function
+                for memo in memo_list:
+                    if memo.is_triggered(detection_result, frame):
+                        if position:
+                            memo.update_position(position)
+                
                 # Create memo function
                 position = is_pinched(detection_result)
                 if position:
@@ -91,7 +97,6 @@ def start(memo_list, detector, audio_pipe):
                 elif memo_new:
                     memo_list.append(memo_new)
                     memo_new = None
-
             frame = add_memo(frame, memo_list)
 
             cv2.imshow("camera", frame)
