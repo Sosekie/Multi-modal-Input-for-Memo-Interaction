@@ -7,7 +7,9 @@
 ## Next steps:
 
 Priority:
+- Add text to memo by speech
 - Improve catch memo function (don't overlap 2 memos while catching)
+- Merge memos togheter by gesture
 - Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
 - Add some Interfaces on the screeen (see which function is ON/OFF)
 
