@@ -1,19 +1,15 @@
 # MMUI_project
 ## Already done:
-- Create the memo with the "pinch" gesture and say "Create".
-- Merge: point the 2 memo and say "Merge" to combine togheter on one unique memo.
+- Implement Merge speech recognition, speech trigger.
+- Implement a Virtual Memo from the Speech (create a new memo).
+- Catch the memo by the gesture 
 
 ## Next steps:
 
 Priority:
-
-- Implement Merge speech recognition, speech trigger.
-
-- Implement a Virtual Memo from the Speech (create a new memo).
-
-- Catch the memo by the gesture 
-
+- Improve catch memo function (don't overlap 2 memos while catching)
 - Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
+- Add some Interfaces on the screeen (see which function is ON/OFF)
 
 ## Environment
 
