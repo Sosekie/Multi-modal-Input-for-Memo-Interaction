@@ -73,10 +73,20 @@ def start(memo_list, detector, audio_pipe):
                 
                 # Merge memo function
                 triggered_memo_list = [memo for memo in memo_list if memo.is_triggered(detection_result, frame)][:2]   # the first 2 triggered memos
-                highlight_memo(frame, triggered_memo_list)
                 if len(triggered_memo_list) == 2:
                     audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
                 
+                # Catch and move memo function
+                for memo in memo_list:
+                    if memo.is_triggered(detection_result, frame):
+                        if position:
+                            memo.update_position(position)
+                
+                highlight_memo(frame, triggered_memo_list)
+                # to check if there are 2 triggered
+                # to implement overlap 
+                # x1 + w1 > x2 
+
                 # Create memo function
                 position = is_pinched(detection_result)
                 if position:
