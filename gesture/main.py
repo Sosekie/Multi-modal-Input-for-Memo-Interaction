@@ -80,10 +80,10 @@ def is_pinched(detection_result):
     return []
 
 
-def draw_landmarks_on_image(rgb_image, detection_result):
+def draw_landmarks_on_image(frame, detection_result):
     hand_landmarks_list = detection_result.hand_landmarks
     handedness_list = detection_result.handedness
-    annotated_image = np.copy(rgb_image)
+    annotated_image = np.copy(frame)
 
     # Loop through the detected hands to visualize.
     for idx in range(len(hand_landmarks_list)):
@@ -104,7 +104,7 @@ def draw_landmarks_on_image(rgb_image, detection_result):
 
     return annotated_image
 
-def add_memo(frame, memo_list):
+def draw_memo(frame, memo_list):
     for memo in memo_list:
         memo_pic = memo.get_pic()
         memo_right = min(memo.position[0]+memo.size, frame.shape[1])

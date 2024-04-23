@@ -85,14 +85,14 @@ def start(memo_list, detector, audio_pipe):
                     # if memo_new already exist, change its position, else create a new memo
                     if memo_new:
                         memo_new.update_position(position)
-                        add_memo(frame, [memo_new])
+                        draw_memo(frame, [memo_new])
                     else:
                         memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(position, audio_done_event_create, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_pipe)
                 elif memo_new:
                     memo_list.append(memo_new)
                     memo_new = None
 
-            frame = add_memo(frame, memo_list)
+            frame = draw_memo(frame, memo_list)
 
             cv2.imshow("camera", frame)
         # press 'q' to exit
