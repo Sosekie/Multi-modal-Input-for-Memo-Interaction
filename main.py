@@ -4,6 +4,7 @@ import threading
 import queue
 
 
+
 def test_1(memo1, memo2):
     memo1.merge(memo2)
     cv2.imshow("memo1", memo1.get_pic())
@@ -44,7 +45,7 @@ def create(position, audio_done_event, last_audio_trigger_time, audio_trigger_in
         recognition_result = result_queue.get()
         if recognition_result:
             print('Now using audio to create memo:')
-            memo_new = Memo(position, "NEW")
+            memo_new = Memo(position)
             print('Create is done!')
             print('----------------------------------')
         audio_done_event.clear()
@@ -61,7 +62,8 @@ def start(memo_list, detector, audio_pipe):
     last_audio_trigger_time = 0
     audio_trigger_interval = 3
 
-    memo_new = None     # a memo that is not settled
+    memo_new = None     # a valuable to keep the feedback from create stream
+
     while True:
         ret, frame = cap.read()
         if ret:
@@ -71,37 +73,131 @@ def start(memo_list, detector, audio_pipe):
             if detection_result:
                 frame = draw_landmarks_on_image(mp_image.numpy_view(), detection_result)
                 
-                # Merge memo function
-                triggered_memo_list = [memo for memo in memo_list if memo.is_triggered(detection_result, frame)][:2]   # the first 2 triggered memos
-                if len(triggered_memo_list) == 2:
+                # Merge memo
+                triggered_memo_list = get_triggered_memo_list(memo_list, detection_result, frame, max_triggered=2)
+                if len(triggered_memo_list) >= 2:
                     audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
-                
-                # Catch and move memo function
-                for memo in memo_list:
-                    if memo.is_triggered(detection_result, frame):
-                        if position:
-                            memo.update_position(position)
-                
-                highlight_memo(frame, triggered_memo_list)
-                # to check if there are 2 triggered
-                # to implement overlap 
-                # x1 + w1 > x2 
 
-                # Create memo function
-                position = is_pinched(detection_result)
+                # get pinched memo list
+                pinched_memo_list = get_pinched_memo_list(memo_list)
+
+                # pinch position -> create memo / merge memo automatically / catch and move memo
+                position = get_pinch_position(detection_result, frame)
                 if position:
-                    position = [int(position[0]*frame.shape[1]), int(position[1]*frame.shape[0])]   # the position from detection_result is a float [0,1], we need int
+                    if position[0][0] == -1:    # all the gestures are not pinch
+                        for pinched_memo in pinched_memo_list:
+                            # merge memo automatically
+                            for memo in memo_list:
+                                if memo is not pinched_memo and is_overlap(memo, pinched_memo):
+                                    pinched_memo.merge(memo)
+                                    memo_list.remove(memo)
+                                    break
+                            pinched_memo.update_pinched(False)
 
-                    # if memo_new already exist, change its position, else create a new memo
-                    if memo_new:
-                        memo_new.update_position(position)
-                        draw_memo(frame, [memo_new])
-                    else:
-                        memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(position, audio_done_event_create, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_pipe)
-                elif memo_new:
-                    memo_list.append(memo_new)
-                    memo_new = None
+                    elif len(position) == 1:
+                        if len(pinched_memo_list) == 0:
+                            # catch and move memos
+                            for triggered_memo in triggered_memo_list:
+                                if is_pinched(triggered_memo, position[0]):
+                                    triggered_memo.update_pinched(True)
+                                    triggered_memo.update_position(position[0])
+                                    triggered_memo_list.remove(triggered_memo)
+                                    break
+                            # create memo
+                            else:
+                                memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(
+                                    position[0], audio_done_event_create, last_audio_trigger_time, audio_trigger_interval,
+                                    result_queue_create, audio_pipe)
+                        else:
+                            # move memo
+                            min_distance = float('inf')
+                            for pinched_memo in pinched_memo_list:
+                                memo_to_pinch_distance = distance.euclidean(pinched_memo.position, position[0])
+                                if memo_to_pinch_distance < min_distance:
+                                    min_distance = memo_to_pinch_distance
+                                    memo_to_update = pinched_memo
+                            if min_distance < memo_to_update.size:
+                                memo_to_update.update_position(position[0])
 
+                    elif len(position) == 2:
+                        if position[1][0] == -1:
+                            if len(pinched_memo_list) == 0:
+                                # catch and move memo
+                                for triggered_memo in triggered_memo_list:
+                                    if is_pinched(triggered_memo, position[0]):
+                                        triggered_memo.update_pinched(True)
+                                        triggered_memo.update_position(position[0])
+                                        triggered_memo_list.remove(triggered_memo)
+                                        break
+                                # create a new memo
+                                else:
+                                    memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(
+                                        position[0], audio_done_event_create, last_audio_trigger_time,
+                                        audio_trigger_interval,
+                                        result_queue_create, audio_pipe)
+                            elif len(pinched_memo_list) == 1:
+                                # move memo
+                                pinched_memo_list[0].update_position(position[0])
+                            elif len(pinched_memo_list) == 2:
+                                # move memo
+                                sorted_pinched_memo_list = sorted(pinched_memo_list, key=lambda m: distance.euclidean(m.position, position[0]))
+                                # After sorted, sorted_pinched_memo_list[0] is the memo closest to the pinch area
+                                memo_to_update = sorted_pinched_memo_list[0]
+                                memo_to_drop = sorted_pinched_memo_list[1]
+
+                                memo_to_update.update_position(position[0])
+                                # merge memo automatically
+                                for memo in memo_list[::-1]:
+                                    if memo is not memo_to_drop and is_overlap(memo, memo_to_drop):
+                                        memo_to_drop.merge(memo)
+                                        memo_list.remove(memo)
+                                        break
+                                memo_to_drop.update_pinched(False)
+                        else:
+                            if len(pinched_memo_list) == 0:
+                                # catch and move memo
+                                for pinch_position in position:
+                                    for triggered_memo in triggered_memo_list:
+                                        if is_pinched(triggered_memo, pinch_position):
+                                            triggered_memo.update_pinched(True)
+                                            triggered_memo.update_position(pinch_position)
+                                            triggered_memo_list.remove(triggered_memo)
+                                            break
+                                    # create a new memo
+                                    else:
+                                        memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(
+                                            pinch_position, audio_done_event_create, last_audio_trigger_time,
+                                            audio_trigger_interval,
+                                            result_queue_create, audio_pipe)
+                            elif len(pinched_memo_list) == 1:
+                                # move memo
+                                sorted_position = sorted(position, key=lambda p: distance.euclidean(pinched_memo_list[0].position, p))
+                                pinched_memo_list[0].update_position(sorted_position[0])
+
+                                # catch and move memo
+                                for triggered_memo in triggered_memo_list:
+                                    if is_pinched(triggered_memo, sorted_position[1]):
+                                        triggered_memo.update_pinched(True)
+                                        triggered_memo.update_position(sorted_position[1])
+                                        triggered_memo_list.remove(triggered_memo)
+                                        break
+                                # create a new memo
+                                else:
+                                    memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = create(
+                                        sorted_position[1], audio_done_event_create, last_audio_trigger_time,
+                                        audio_trigger_interval,
+                                        result_queue_create, audio_pipe)
+                            elif len(pinched_memo_list) == 2:
+                                # move memo
+                                sorted_position = sorted(position, key=lambda p: distance.euclidean(pinched_memo_list[0].position, p))
+                                pinched_memo_list[0].update_position(sorted_position[0])
+                                pinched_memo_list[1].update_position(sorted_position[1])
+
+            if memo_new is not None:
+                memo_list.append(memo_new)
+            highlight_memo(frame, triggered_memo_list)
+            pinched_memo_list = get_pinched_memo_list(memo_list)
+            highlight_memo(frame, pinched_memo_list, highlight_color=(64, 64, 255))
             frame = draw_memo(frame, memo_list)
 
             cv2.imshow("camera", frame)
@@ -117,8 +213,9 @@ if __name__ == "__main__":
     # initialize
     model_id = ["openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
-    memo1 = Memo([0, 0], "A")
-    # memo2 = Memo([0, 600], "B")
+    memo1 = Memo([0, 0], content="A")
+    memo1.update_pinched(False)
+    # memo2 = Memo([0, 600], content="B")
     memo_list = [memo1]
     detector = detector_init()
 
