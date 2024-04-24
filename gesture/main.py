@@ -52,7 +52,7 @@ class Memo:
         return self.pic
 
     def merge(self, memo):
-        self.content = (self.content + memo.content)[:4]
+        self.content = (memo.content + self.content)[:4]
         self.color = (self.color + memo.color) // 2
         self.update_pic()
 
