@@ -13,6 +13,15 @@ Priority:
 - Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
 - Add some Interfaces on the screeen (see which function is ON/OFF)
 
+## Evaluation statistics about (still to choose):
+- response time of functions
+- how much time it takes to move a memo from a specific point to another
+- better do the merge with the speech or catching 2 memos togheter
+- percentage of the correct speech text on the memo said
+- how much time it takes to recognize correctly the speech command
+- confront the speed text writing between keyboard typing and speech talk
+- confront speed merging between our modalities and the copy paste mouse/keyboard modality
+
 ## Environment
 
 Windows, Anaconda
