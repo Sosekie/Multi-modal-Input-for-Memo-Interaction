@@ -21,6 +21,7 @@ Priority:
 - how much time it takes to recognize correctly the speech command
 - confront the speed text writing between keyboard typing and speech talk
 - confront speed merging between our modalities and the copy paste mouse/keyboard modality
+- Using as references System Usability Scale (SUS) or Usability Metric for User Experience (UMUX)
 
 ## Environment
 
