@@ -2,6 +2,7 @@ from gesture.main import *
 from speech2txt.main import *
 import threading
 import queue
+from utils.function import merge, create, open, add, write, close
 
 
 
@@ -13,54 +14,13 @@ def test_1(memo1, memo2):
     cv2.destroyAllWindows()
 
 
-def merge(memo1, memo2, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
-    current_time = time.time()
-    if not audio_done_event.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
-        print('Now start audio recognition:')
-        last_audio_trigger_time = current_time
-        audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_merge, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
-    if audio_done_event.is_set():
-        recognition_result = result_queue.get()
-        if recognition_result:
-            print('Now using audio to merge memo:')
-            memo1.merge(memo2)
-            print('Merge is done!')
-            print('----------------------------------')
-        audio_done_event.clear()
-    return audio_done_event, last_audio_trigger_time, result_queue
-
-
-def create(position, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
-    current_time = time.time()
-    memo_new = None
-    if not audio_done_event.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
-        print('Now start audio recognition:')
-        last_audio_trigger_time = current_time
-        audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_create, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
-    if audio_done_event.is_set():
-        recognition_result = result_queue.get()
-        if recognition_result:
-            print('Now using audio to create memo:')
-            memo_new = Memo(position)
-            print('Create is done!')
-            print('----------------------------------')
-        audio_done_event.clear()
-    return memo_new, audio_done_event, last_audio_trigger_time, result_queue
-
-
 def start(memo_list, detector, audio_pipe):
     cap = cv2.VideoCapture(0)
     # threading event here
-    audio_done_event_merge = threading.Event()
-    audio_done_event_create = threading.Event()
-    result_queue_merge = queue.Queue()
-    result_queue_create = queue.Queue()
+    audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write, audio_done_event_close = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
+    result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write, result_queue_close = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
     last_audio_trigger_time = 0
-    audio_trigger_interval = 3
+    audio_trigger_interval = 1
 
     memo_new = None     # a valuable to keep the feedback from create stream
 
@@ -118,6 +78,10 @@ def start(memo_list, detector, audio_pipe):
                                     memo_to_update = pinched_memo
                             if min_distance < memo_to_update.size:
                                 memo_to_update.update_position(position[0])
+                            # open
+                            audio_done_event_open, last_audio_trigger_time, result_queue_open = open(
+                                memo, memo_list, audio_done_event_open, last_audio_trigger_time, audio_trigger_interval,
+                                result_queue_open, audio_pipe)
 
                     elif len(position) == 2:
                         if position[1][0] == -1:
@@ -193,6 +157,17 @@ def start(memo_list, detector, audio_pipe):
                                 pinched_memo_list[0].update_position(sorted_position[0])
                                 pinched_memo_list[1].update_position(sorted_position[1])
 
+            # add
+            for memo in memo_list:
+                if memo.is_opened and not memo.is_added:
+                    audio_done_event_add, last_audio_trigger_time, result_queue_add = add(
+                        memo, audio_done_event_add, last_audio_trigger_time, audio_trigger_interval,
+                        result_queue_add, audio_pipe)
+                if memo.is_added:
+                    audio_done_event_write, last_audio_trigger_time, result_queue_write = write(
+                        memo, audio_done_event_write, last_audio_trigger_time, audio_trigger_interval,
+                        result_queue_write, audio_pipe)
+
             if memo_new is not None:
                 memo_list.append(memo_new)
             highlight_memo(frame, triggered_memo_list)
@@ -201,6 +176,10 @@ def start(memo_list, detector, audio_pipe):
             frame = draw_memo(frame, memo_list)
 
             cv2.imshow("camera", frame)
+            for memo in memo_list:
+                if memo.is_opened:
+                    cv2.imshow("memo_display", memo.get_big_pic())
+
         # press 'q' to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -213,6 +192,7 @@ if __name__ == "__main__":
     # initialize
     model_id = ["openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
+    # audio_pipe_large = model_initialize(model_id[1])
     memo1 = Memo([0, 0], content="A")
     memo1.update_pinched(False)
     # memo2 = Memo([0, 600], content="B")

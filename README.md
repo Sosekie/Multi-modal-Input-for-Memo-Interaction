@@ -13,6 +13,14 @@ Priority:
 - Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
 - Add some Interfaces on the screeen (see which function is ON/OFF)
 
+How to add text:
+- catch a memo
+- say open
+- say add
+- speak content
+- say stop
+- say close
+
 ## Evaluation statistics about (still to choose):
 - response time of functions
 - how much time it takes to move a memo from a specific point to another

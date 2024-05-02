@@ -11,27 +11,28 @@ import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-COLOR_NUM = 20
-COLOR_MAP = plt.cm.get_cmap('tab20', COLOR_NUM)
 
 class Memo:
-    def __init__(self, position, content=None, size=100):
+    def __init__(self, position, content=None, size=100, big_size=[300, 800]):
         self.position = position    # position = [x, y]
 
-        rand_color = np.array(COLOR_MAP(randint(0, COLOR_NUM-1))[:3]) * 255
-        self.color = rand_color.astype(np.uint8)
+        self.color = np.random.randint(150, 241, size=3).astype(np.uint8)
         self.content = random.choice(string.ascii_uppercase)
         if content:
             self.content = content
         self.size = int(size)
+        self.big_size = big_size
         
         self.pic = np.zeros((self.size, self.size, 3), dtype=np.uint8)
+        self.big_pic = np.zeros((self.big_size[0], self.big_size[1], 3), dtype=np.uint8)
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.font_scale = 1
-        self.font_color = (255, 255, 255)  # 白色
+        self.font_color = (255, 255, 255)
         self.font_thickness = 2
 
         self.is_pinched = True
+        self.is_opened = False
+        self.is_added = False
 
         self.update_pic()
 
@@ -48,8 +49,25 @@ class Memo:
         # update
         self.pic = picture.astype(np.uint8)
 
+        # for big pic
+        picture = np.broadcast_to(self.color, (self.big_size[0], self.big_size[1], 3))
+        picture = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
+        text_size = cv2.getTextSize(self.content, self.font, self.font_scale, self.font_thickness)
+        text_x = 10
+        text_y = text_size[0][1] + 10
+        cv2.putText(picture, self.content, (text_x, text_y), self.font, self.font_scale, self.font_color, self.font_thickness)
+        self.big_pic = picture.astype(np.uint8)
+
+    def update_content(self, content):
+        self.content = str(content)
+        self.update_pic()
+        print('Update:', self.content)
+
     def get_pic(self):
         return self.pic
+
+    def get_big_pic(self):
+        return self.big_pic
 
     def merge(self, memo):
         self.content = (memo.content + self.content)[:4]
@@ -74,6 +92,12 @@ class Memo:
     # Update pinched status
     def update_pinched(self, status):
         self.is_pinched = status
+
+    def update_opened(self, status):
+        self.is_opened = status
+
+    def update_added(self, status):
+        self.is_added = status
 
 # if there is any overlap between 2 memos
 def is_overlap(memo1, memo2):
