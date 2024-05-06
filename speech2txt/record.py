@@ -6,10 +6,9 @@ import soundfile as sf
 def record(duration = 3):
     sample_rate = 16000
 
-    print("🎵 - Start Recording...")
+    print("🎵 - Recording...")
     audio = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1, dtype='float32')
     sd.wait()
-    print("🎵 - End Recording")
 
     byte_io = BytesIO()
     sf.write(byte_io, audio, sample_rate, format='WAV')

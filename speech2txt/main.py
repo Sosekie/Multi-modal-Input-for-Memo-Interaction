@@ -9,7 +9,7 @@ def audio_trigger_merge(pipe, result_queue, done_event):
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
-    print('🎼 - Merge: ', text)
+    print('🥝 - 🎼 - Merge: ', text)
     if "m" in text.lower() or "g" in text.lower():
         result_queue.put(True)
         # print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -23,7 +23,7 @@ def audio_trigger_create(pipe, result_queue, done_event):
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
-    print('🎼 - Create: ', text)
+    print('🍉 - 🎼 - Create: ', text)
     if "c" in text.lower() or "t" in text.lower():
         result_queue.put(True)
         # print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -37,7 +37,7 @@ def audio_trigger_open(pipe, result_queue, done_event):
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
-    print('🎼 - Open: ', text)
+    print('🍑 - 🎼 - Open: ', text)
     if "o" in text.lower() or "p" in text.lower() or "n" in text.lower():
         result_queue.put(True)
         # print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -51,7 +51,7 @@ def audio_trigger_add(pipe, result_queue, done_event):
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
-    print('🎼 - Add: ', text)
+    print('🫐 - 🎼 - Add: ', text)
     if "a" in text.lower() or "d" in text.lower():
         result_queue.put(True)
         # print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -65,7 +65,7 @@ def audio_trigger_write(pipe, result_queue, done_event):
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
-    print('👣 - Write: ', text)
+    print('🥥 - 👣 - Write: ', text)
     result_queue.put(text)
     # print(f"total time: {(datetime.now() - start_time).total_seconds()} seconds")
     done_event.set()

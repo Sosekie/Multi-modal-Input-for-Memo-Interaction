@@ -5,15 +5,6 @@ import queue
 from utils.function import merge, create, open, add, write, close
 
 
-
-def test_1(memo1, memo2):
-    memo1.merge(memo2)
-    cv2.imshow("memo1", memo1.get_pic())
-    cv2.imshow("memo2", memo2.get_pic())
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-
 def start(memo_list, detector, audio_pipe):
     cap = cv2.VideoCapture(0)
     # threading event here
