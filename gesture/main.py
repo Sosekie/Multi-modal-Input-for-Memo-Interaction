@@ -13,7 +13,7 @@ from mediapipe.tasks.python import vision
 
 
 class Memo:
-    def __init__(self, position, content=None, size=100, big_size=[300, 800]):
+    def __init__(self, position, content=None, size=100, big_size=[200, 838]):
         self.position = position    # position = [x, y]
 
         self.color = np.random.randint(150, 241, size=3).astype(np.uint8)

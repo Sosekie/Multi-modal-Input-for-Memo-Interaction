@@ -2,7 +2,7 @@ from gesture.main import *
 from speech2txt.main import *
 import threading
 import queue
-from utils.function import merge, create, open, add, write, close
+from utils.function import merge, create, open, add, write, close, add_memo_bar_to_frame, add_status_bar_to_frame, OutputStatus
 
 
 def start(memo_list, detector, audio_pipe):
@@ -14,10 +14,16 @@ def start(memo_list, detector, audio_pipe):
     audio_trigger_interval = 1
 
     memo_new = None     # a valuable to keep the feedback from create stream
+    # output_status = OutputStatus()
 
     while True:
         ret, frame = cap.read()
         if ret:
+            height, width = frame.shape[:2]
+            new_width = int(width * 1.3)
+            new_height = int(height * 1.3)
+            frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
+
             frame = np.array(frame[:, ::-1, :], dtype=np.uint8)
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
             detection_result = detector.detect(mp_image)
@@ -166,10 +172,11 @@ def start(memo_list, detector, audio_pipe):
             highlight_memo(frame, pinched_memo_list, highlight_color=(64, 64, 255))
             frame = draw_memo(frame, memo_list)
 
-            cv2.imshow("camera", frame)
             for memo in memo_list:
                 if memo.is_opened:
                     cv2.imshow("memo_display", memo.get_big_pic())
+                    # frame = add_memo_bar_to_frame(frame, memo)
+            cv2.imshow("camera", frame)
 
         # press 'q' to exit
         if cv2.waitKey(1) & 0xFF == ord('q'):

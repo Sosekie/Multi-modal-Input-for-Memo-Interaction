@@ -110,3 +110,44 @@ def close(memo, audio_done_event, last_audio_trigger_time, audio_trigger_interva
             print('----------------------------------')
         audio_done_event.clear()
     return audio_done_event, last_audio_trigger_time, result_queue
+
+
+def add_memo_bar_to_frame(frame, memo, bar_height=200, bg_color=(255, 255, 255), text_color=(0, 0, 0), font_scale=0.5, thickness=1):
+    height, width = frame.shape[:2]
+    # bg_color = memo.color
+    text_color = memo.font_color
+    full_frame = np.zeros((height + bar_height, width, 3), dtype=np.uint8)
+    full_frame[:height, :, :] = frame
+    cv2.rectangle(full_frame, (0, height), (width, height + bar_height), bg_color, -1)
+
+    vertical_position = height + 15
+    
+    cv2.putText(full_frame, memo.content, (10, vertical_position), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, thickness)
+    vertical_position += int(bar_height * 0.15)
+
+    return full_frame
+
+
+def add_status_bar_to_frame(frame, status_texts, bar_height=300, bg_color=(255, 255, 255), text_color=(0, 0, 0), font_scale=0.5, thickness=1):
+    height, width = frame.shape[:2]
+    full_frame = np.zeros((height + bar_height, width, 3), dtype=np.uint8)
+    full_frame[:height, :, :] = frame
+    cv2.rectangle(full_frame, (0, height), (width, height + bar_height), bg_color, -1)
+
+    vertical_position = height + 15
+    
+    for text in status_texts:
+        cv2.putText(full_frame, text, (10, vertical_position), cv2.FONT_HERSHEY_SIMPLEX, font_scale, text_color, thickness)
+        vertical_position += int(bar_height * 0.15)
+
+    return full_frame
+
+
+class OutputStatus:
+    def __init__(self, output_status = []):
+        self.status = output_status
+    
+    def update_output_status(self, new_status):
+        if len(self.status) >= 10:
+            self.status = self.status[-9:]
+        self.status.append(new_status)
