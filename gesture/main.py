@@ -30,7 +30,6 @@ class Memo:
         self.font_color = (255, 255, 255)
         self.font_thickness = 2
 
-        self.is_pinched = True
         self.is_opened = False
         self.is_added = False
 
@@ -75,9 +74,7 @@ class Memo:
         self.color = (self.color + memo.color) // 2
         self.update_pic()
 
-    def is_triggered(self, detection_result, frame):
-        hand_landmarks_list = detection_result.hand_landmarks
-    
+    def is_triggered(self, hand_landmarks_list, frame):
         for hand_landmarks in hand_landmarks_list:
             for landmark in hand_landmarks:
                 if (self.position[0] <= landmark.x*frame.shape[1] <= self.position[0]+self.size and
@@ -90,9 +87,6 @@ class Memo:
         if distance.euclidean(self.position, new_pos) < self.size:
             self.position = new_pos
 
-    # Update pinched status
-    def update_pinched(self, status):
-        self.is_pinched = status
 
     ############Chenrui###############
     def update_opened(self, status):
@@ -102,18 +96,20 @@ class Memo:
         self.is_added = status
     ##################################
 
+
 # if there is any overlap between 2 memos
 def is_overlap(memo1, memo2):
     return np.all(np.array(memo1.position)+memo1.size > memo2.position) and \
            np.all(np.array(memo2.position)+memo2.size > memo1.position)
 
+
 # get a triggered memo list from memo list
-def get_triggered_memo_list(memo_list, detection_result, frame, max_triggered=5):
+def get_triggered_memo_list(memo_list, hand_landmarks_list, frame, max_triggered=5):
     triggered_memo_list = []
     for memo in memo_list[::-1]:
         if len(triggered_memo_list) >= max_triggered:
             break
-        elif not memo.is_pinched and memo.is_triggered(detection_result, frame):    # pinched memos and triggered memos are in different groups
+        elif memo.is_triggered(hand_landmarks_list, frame):    # pinched memos and triggered memos are in different groups
             for triggered_memo in triggered_memo_list:
                 if is_overlap(memo, triggered_memo):
                     break
@@ -122,29 +118,19 @@ def get_triggered_memo_list(memo_list, detection_result, frame, max_triggered=5)
 
     return triggered_memo_list
 
-def get_pinched_memo_list(memo_list):
-    pinched_memo_list = []
-    for memo in memo_list:
-        if memo.is_pinched:
-            pinched_memo_list.append(memo)
-            
-    return pinched_memo_list
 
-def get_pinch_position(detection_result, frame):
-    pinch_position = []
-    hand_landmarks_list = detection_result.hand_landmarks
+def get_pinch_position(hand_landmarks, frame):
+    pinch_position = None
 
-    for hand_landmarks in hand_landmarks_list:
-        # Both landmarks are in the touch area, calculate distance
-        thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
-        thumb_tip_middle_distance = abs(hand_landmarks[6].x - hand_landmarks[3].x) + abs(hand_landmarks[6].y - hand_landmarks[3].y)
-        if thumb_tip_distance < thumb_tip_middle_distance:
-            position = [int(hand_landmarks[4].x*frame.shape[1]), int(hand_landmarks[4].y*frame.shape[0])]
-            pinch_position.append(position)
-        else:
-            pinch_position.append([-1, -1])     # which means this hand is not in a pinch gesture
+    # Both landmarks are in the touch area, calculate distance
+    thumb_tip_distance = abs(hand_landmarks[8].x - hand_landmarks[4].x) + abs(hand_landmarks[8].y - hand_landmarks[4].y)
+    thumb_tip_middle_distance = abs(hand_landmarks[6].x - hand_landmarks[3].x) + abs(hand_landmarks[6].y - hand_landmarks[3].y)
+    if thumb_tip_distance < thumb_tip_middle_distance:
+        pinch_position = [int(hand_landmarks[4].x*frame.shape[1]), int(hand_landmarks[4].y*frame.shape[0])]
+
     # If there is no hand or landmark in the touch area, it will return False
-    return sorted(pinch_position, key=lambda x: x[0], reverse=True)     # sort, first pinch position, next unpinch
+    return pinch_position
+
 
 # If the pinch position pinched a memo
 def is_pinched(memo, position):
@@ -187,8 +173,10 @@ def draw_memo(frame, memo_list):
 
     return frame
 
-def highlight_memo(frame, triggered_memo_list, highlight_color=(0,255,255)):
-    for memo in triggered_memo_list:
+def highlight_memo(frame, memo_list, highlight_color=(0,255,255)):
+    for memo in memo_list:
+        if memo is None:
+            continue
         highlight_left = max(memo.position[0] - 10, 0)
         highlight_right = min(memo.position[0] + memo.size + 10, frame.shape[1])
         highlight_top = max(memo.position[1] - 10, 0)
