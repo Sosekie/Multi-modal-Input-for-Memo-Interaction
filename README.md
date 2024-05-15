@@ -2,7 +2,9 @@
 ## Already done:
 - Implement Merge speech recognition, speech trigger.
 - Implement a Virtual Memo from the Speech (create a new memo).
-- Catch the memo by the gesture 
+- Catch the memo by the gesture
+- Open the memo on a new window
+- Templete evaluation survey: https://docs.google.com/forms/d/e/1FAIpQLScNHHTZhl1JdlbPnvrYLgjG7TIuZC6hA3dre9IEgac6i2ZWVQ/viewform?usp=sharing
 
 ## Next steps:
 
