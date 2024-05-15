@@ -49,6 +49,7 @@ class Memo:
         # update
         self.pic = picture.astype(np.uint8)
 
+        ############Chenrui###############
         # for big pic
         picture = np.broadcast_to(self.color, (self.big_size[0], self.big_size[1], 3))
         picture = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
@@ -57,11 +58,11 @@ class Memo:
         text_y = text_size[0][1] + 10
         cv2.putText(picture, self.content, (text_x, text_y), self.font, self.font_scale, self.font_color, self.font_thickness)
         self.big_pic = picture.astype(np.uint8)
+        ##################################
 
     def update_content(self, content):
         self.content = str(content)
         self.update_pic()
-        print('Update:', self.content)
 
     def get_pic(self):
         return self.pic
@@ -93,11 +94,13 @@ class Memo:
     def update_pinched(self, status):
         self.is_pinched = status
 
+    ############Chenrui###############
     def update_opened(self, status):
         self.is_opened = status
 
     def update_added(self, status):
         self.is_added = status
+    ##################################
 
 # if there is any overlap between 2 memos
 def is_overlap(memo1, memo2):
@@ -194,14 +197,3 @@ def highlight_memo(frame, triggered_memo_list, highlight_color=(0,255,255)):
         cv2.rectangle(frame, (highlight_left, highlight_top), (highlight_right, highlight_bottom), highlight_color, -1)
 
     return frame
-    
-def detector_init():
-
-    base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
-    options = vision.HandLandmarkerOptions(base_options=base_options,
-                                        min_hand_detection_confidence=0.2,
-                                        min_hand_presence_confidence=0.9,
-                                        num_hands=2)
-    detector = vision.HandLandmarker.create_from_options(options)
-
-    return detector
