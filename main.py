@@ -2,7 +2,7 @@ from gesture.main import *
 from speech2txt.main import *
 import threading
 import queue
-from utils.function import merge, create, open, add, write, close, add_memo_bar_to_frame, add_status_bar_to_frame, OutputStatus
+from utils.function import merge, create, open, add_close, write
 
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -40,6 +40,8 @@ def start(memo_list, audio_pipe):
     with vision.HandLandmarker.create_from_options(options) as detector:
         triggered_memo_list = []
         pinched_memo_list = [None, None]
+        opened_memo = None
+        window_created = False
 
         while True:
             ret, frame = cap.read()
@@ -79,16 +81,30 @@ def start(memo_list, audio_pipe):
                             if pinched_memo is not None:
                                 # move memo
                                 pinched_memo.update_position(pinch_position)
+
+                                if pinched_memo == opened_memo:
+                                    if pinched_memo.is_added:
+                                        # write
+                                        audio_done_event_write, last_audio_trigger_time, result_queue_write = write(
+                                            pinched_memo, audio_done_event_write, last_audio_trigger_time, audio_trigger_interval,
+                                            result_queue_write, audio_pipe)
+                                    else:
+                                        # add
+                                        opened_memo, audio_done_event_add, last_audio_trigger_time, result_queue_add = add_close(
+                                            opened_memo, pinched_memo, audio_done_event_add, last_audio_trigger_time, audio_trigger_interval,
+                                            result_queue_add, audio_pipe)
+                                else:
+                                    opened_memo, audio_done_event_open, last_audio_trigger_time, result_queue_open = open(
+                                        opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_time, audio_trigger_interval,
+                                        result_queue_open, audio_pipe)
+                                    
                             else:
-                                # catch, move and open memo
+                                # catch and move memo
                                 for triggered_memo in triggered_memo_list:
                                     if is_pinched(triggered_memo, pinch_position):
                                         pinched_memo_list[handedness_idx] = triggered_memo
                                         triggered_memo.update_position(pinch_position)
                                         triggered_memo_list.remove(triggered_memo)
-                                        # open
-                                        audio_done_event_open, last_audio_trigger_time, result_queue_open = open(memo, memo_list,
-                                                                                                                 audio_done_event_open, last_audio_trigger_time, audio_trigger_interval, result_queue_open, audio_pipe)
                                         break
                                 # create a new memo
                                 else:
@@ -106,31 +122,19 @@ def start(memo_list, audio_pipe):
                                     break
                             pinched_memo_list[handedness_idx] = None
 
-                ############Chenrui###############
-                # add
-                for memo in memo_list:
-                    if memo.is_opened and not memo.is_added:
-                        audio_done_event_add, last_audio_trigger_time, result_queue_add = add(
-                            memo, audio_done_event_add, last_audio_trigger_time, audio_trigger_interval,
-                            result_queue_add, audio_pipe)
-                    if memo.is_added:
-                        audio_done_event_write, last_audio_trigger_time, result_queue_write = write(
-                            memo, audio_done_event_write, last_audio_trigger_time, audio_trigger_interval,
-                            result_queue_write, audio_pipe)
-                ##################################
-
                 if memo_new is not None:
                     memo_list.append(memo_new)
                 highlight_memo(frame, triggered_memo_list)
                 highlight_memo(frame, pinched_memo_list, highlight_color=(64, 64, 255))
                 frame = draw_memo(frame, memo_list)
 
-                ############Chenrui###############
-                for memo in memo_list:
-                    if memo.is_opened:
-                        cv2.imshow("memo_display", memo.get_big_pic())
-                        # frame = add_memo_bar_to_frame(frame, memo)
-                ##################################
+                if opened_memo:
+                    cv2.imshow("memo_display", opened_memo.get_big_pic())
+                    window_created = True
+                elif window_created:
+                        cv2.destroyWindow("memo_display")
+                        window_created = False
+
                 cv2.imshow("camera", frame)
 
             # press 'q' to exit

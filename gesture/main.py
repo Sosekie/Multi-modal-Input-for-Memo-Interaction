@@ -30,7 +30,6 @@ class Memo:
         self.font_color = (255, 255, 255)
         self.font_thickness = 2
 
-        self.is_opened = False
         self.is_added = False
 
         self.update_pic()
@@ -48,7 +47,6 @@ class Memo:
         # update
         self.pic = picture.astype(np.uint8)
 
-        ############Chenrui###############
         # for big pic
         picture = np.broadcast_to(self.color, (self.big_size[0], self.big_size[1], 3))
         picture = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
@@ -57,7 +55,6 @@ class Memo:
         text_y = text_size[0][1] + 10
         cv2.putText(picture, self.content, (text_x, text_y), self.font, self.font_scale, self.font_color, self.font_thickness)
         self.big_pic = picture.astype(np.uint8)
-        ##################################
 
     def update_content(self, content):
         self.content = str(content)
@@ -87,14 +84,8 @@ class Memo:
         if distance.euclidean(self.position, new_pos) < self.size:
             self.position = new_pos
 
-
-    ############Chenrui###############
-    def update_opened(self, status):
-        self.is_opened = status
-
     def update_added(self, status):
         self.is_added = status
-    ##################################
 
 
 # if there is any overlap between 2 memos
