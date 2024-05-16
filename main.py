@@ -94,6 +94,7 @@ def start(memo_list, audio_pipe):
                                             opened_memo, pinched_memo, audio_done_event_add, last_audio_trigger_time, audio_trigger_interval,
                                             result_queue_add, audio_pipe)
                                 else:
+                                    # open
                                     opened_memo, audio_done_event_open, last_audio_trigger_time, result_queue_open = open(
                                         opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_time, audio_trigger_interval,
                                         result_queue_open, audio_pipe)
@@ -119,6 +120,8 @@ def start(memo_list, audio_pipe):
                                     memo_list.remove(memo)
                                     if memo in pinched_memo_list:
                                         pinched_memo_list[(idx+1)%2] = None
+                                    if memo == opened_memo:
+                                        opened_memo = pinched_memo
                                     break
                             pinched_memo_list[handedness_idx] = None
 
