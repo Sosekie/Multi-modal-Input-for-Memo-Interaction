@@ -23,7 +23,7 @@ def start(memo_list, audio_pipe):
     audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write, audio_done_event_close = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
     result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write, result_queue_close = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
     last_audio_trigger_time = 0
-    audio_trigger_interval = 1
+    audio_trigger_interval = 3
 
     # Create a hand landmarker instance with the live stream mode
     base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
@@ -157,7 +157,7 @@ def result_callback(result: vision.HandLandmarkerResult, output_image: mp.Image,
 
 if __name__ == "__main__":
     # initialize
-    model_id = ["openai/whisper-base", "openai/whisper-large-v3"]
+    model_id = ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
     memo1 = Memo([0, 0], content="A")
     memo_list = [memo1]
