@@ -54,8 +54,6 @@ class Memo:
         text_x = 20
         text_y = text_size[0][1] + 20
         cv2.putText(picture, self.content, (text_x, text_y), self.font, self.font_scale, self.font_color, self.font_thickness)
-        if self.is_added:
-            cv2.rectangle(picture, (0, 0), (self.big_size[1] - 1, self.big_size[0] - 1), (0, 0, 255), 10)  # Red border
         self.big_pic = picture.astype(np.uint8)
 
     def update_content(self, content):
@@ -66,7 +64,10 @@ class Memo:
         return self.pic
 
     def get_big_pic(self):
-        return self.big_pic
+        picture = self.big_pic
+        if self.is_added:
+            cv2.rectangle(picture, (0, 0), (self.big_size[1] - 1, self.big_size[0] - 1), (0, 0, 255), 10)  # Red border
+        return picture
 
     def merge(self, memo):
         self.content = memo.content + self.content
