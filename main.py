@@ -23,7 +23,7 @@ def start(memo_list, audio_pipe):
     audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write, audio_done_event_close = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
     result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write, result_queue_close = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
     last_audio_trigger_time = 0
-    audio_trigger_interval = 1
+    audio_trigger_interval = 3
 
     # Create a hand landmarker instance with the live stream mode
     base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
@@ -69,7 +69,7 @@ def start(memo_list, audio_pipe):
                     # Merge memo
                     triggered_memo_list = get_triggered_memo_list(memo_list, hand_landmarks_list, frame, max_triggered=2)
                     if len(triggered_memo_list) >= 2:
-                        audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
+                        memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
 
                     for idx in range(len(hand_landmarks_list)):
                         hand_landmarks = hand_landmarks_list[idx]

@@ -51,9 +51,11 @@ class Memo:
         picture = np.broadcast_to(self.color, (self.big_size[0], self.big_size[1], 3))
         picture = cv2.cvtColor(picture, cv2.COLOR_BGR2RGB)
         text_size = cv2.getTextSize(self.content, self.font, self.font_scale, self.font_thickness)
-        text_x = 10
-        text_y = text_size[0][1] + 10
+        text_x = 20
+        text_y = text_size[0][1] + 20
         cv2.putText(picture, self.content, (text_x, text_y), self.font, self.font_scale, self.font_color, self.font_thickness)
+        if self.is_added:
+            cv2.rectangle(picture, (0, 0), (self.big_size[1] - 1, self.big_size[0] - 1), (0, 0, 255), 10)  # Red border
         self.big_pic = picture.astype(np.uint8)
 
     def update_content(self, content):
