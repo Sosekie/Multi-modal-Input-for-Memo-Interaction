@@ -4,7 +4,7 @@ import threading
 
 audio_thread_lock = threading.Lock()
 
-def merge(memo1, memo2, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
+def merge(memo1, memo2, memo_list, opened_memo, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
     current_time = time.time()
     if not audio_done_event.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
         with audio_thread_lock:
@@ -18,8 +18,11 @@ def merge(memo1, memo2, audio_done_event, last_audio_trigger_time, audio_trigger
         if recognition_result:
             print('🥝 - Merge - Using Merge Command to Merge Memo')
             memo1.merge(memo2)
+            memo_list.remove(memo2)
+            if memo2 == opened_memo:
+                opened_memo = memo1
         audio_done_event.clear()
-    return audio_done_event, last_audio_trigger_time, result_queue
+    return memo_list, opened_memo, audio_done_event, last_audio_trigger_time, result_queue
 
 
 def create(position, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):

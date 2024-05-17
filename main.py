@@ -69,7 +69,7 @@ def start(memo_list, audio_pipe):
                     # Merge memo
                     triggered_memo_list = get_triggered_memo_list(memo_list, hand_landmarks_list, frame, max_triggered=2)
                     if len(triggered_memo_list) >= 2:
-                        audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
+                        memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
 
                     for idx in range(len(hand_landmarks_list)):
                         hand_landmarks = hand_landmarks_list[idx]
