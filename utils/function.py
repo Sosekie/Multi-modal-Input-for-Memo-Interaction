@@ -2,6 +2,7 @@ from gesture.main import *
 from speech2txt.main import *
 import threading
 
+audio_thread_lock = threading.Lock()
 
 def merge(memo1, memo2, memo_list, opened_memo, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
     current_time = time.time()
@@ -9,8 +10,9 @@ def merge(memo1, memo2, memo_list, opened_memo, audio_done_event, last_audio_tri
         print('🥝 - Merge - Start Merge Command Recognition')
         last_audio_trigger_time = current_time
         audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_merge, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
+        with audio_thread_lock:
+            audio_thread = threading.Thread(target=audio_trigger_merge, args=(audio_pipe, result_queue, audio_done_event))
+            audio_thread.start()
     if audio_done_event.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
@@ -26,18 +28,19 @@ def merge(memo1, memo2, memo_list, opened_memo, audio_done_event, last_audio_tri
 def create(position, audio_done_event, last_audio_trigger_time, audio_trigger_interval, result_queue, audio_pipe):
     current_time = time.time()
     memo_new = None
-    if not audio_done_event.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
-        print('🍉 - Create - Start Create Command Recognition')
-        last_audio_trigger_time = current_time
-        audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_create, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
     if audio_done_event.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
             print('🍉 - Create - Using Create Command to Create Memo')
             memo_new = Memo(position)
         audio_done_event.clear()
+    elif not audio_done_event.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
+        print('🍉 - Create - Start Create Command Recognition')
+        last_audio_trigger_time = current_time
+        audio_done_event.clear()
+        with audio_thread_lock:
+            audio_thread = threading.Thread(target=audio_trigger_create, args=(audio_pipe, result_queue, audio_done_event))
+            audio_thread.start()
     return memo_new, audio_done_event, last_audio_trigger_time, result_queue
 
 
@@ -47,8 +50,9 @@ def open(opened_memo, pinched_memo, audio_done_event, last_audio_trigger_time, a
         print('🍑 - Open - Start Open Command Recognition')
         last_audio_trigger_time = current_time
         audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_open, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
+        with audio_thread_lock:
+            audio_thread = threading.Thread(target=audio_trigger_open, args=(audio_pipe, result_queue, audio_done_event))
+            audio_thread.start()
     if audio_done_event.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
@@ -64,8 +68,9 @@ def add_close(opened_memo, memo, audio_done_event, last_audio_trigger_time, audi
         print('🫐🥑 - Add or Close - Start Command Recognition')
         last_audio_trigger_time = current_time
         audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_add, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
+        with audio_thread_lock:
+            audio_thread = threading.Thread(target=audio_trigger_add, args=(audio_pipe, result_queue, audio_done_event))
+            audio_thread.start()
     if audio_done_event.is_set():
         recognition_result = result_queue.get()
         if recognition_result == 1:
@@ -84,8 +89,9 @@ def write(memo, audio_done_event, last_audio_trigger_time, audio_trigger_interva
         print('🥥 - Write - Start Write Command Recognition')
         last_audio_trigger_time = current_time
         audio_done_event.clear()
-        audio_thread = threading.Thread(target=audio_trigger_write, args=(audio_pipe, result_queue, audio_done_event))
-        audio_thread.start()
+        with audio_thread_lock:
+            audio_thread = threading.Thread(target=audio_trigger_write, args=(audio_pipe, result_queue, audio_done_event))
+            audio_thread.start()
     if audio_done_event.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
