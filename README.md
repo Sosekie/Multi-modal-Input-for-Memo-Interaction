@@ -62,6 +62,8 @@ Windows, Anaconda
 
 - pip install pyaudio
 
+- pip install torchaudio
+
 ##### Install ffmpeg on windows:
 
 - Install ffmpeg in mmui:
