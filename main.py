@@ -159,7 +159,7 @@ if __name__ == "__main__":
     # initialize
     model_id = ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
-    memo1 = Memo([0, 0], content="A")
+    memo1 = Memo([100, 100], content="A")
     memo_list = [memo1]
 
     start(memo_list, audio_pipe)
