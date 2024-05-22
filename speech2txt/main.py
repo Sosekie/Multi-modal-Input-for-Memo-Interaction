@@ -64,7 +64,7 @@ def audio_trigger_add(pipe, result_queue, done_event):
 
 def audio_trigger_write(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 10)
+    byte_io = record(duration = 7)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
