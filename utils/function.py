@@ -3,11 +3,17 @@ import time
 from gesture.main import *
 from speech2txt.main import *
 
+thread_semaphore = threading.Semaphore(1)
+
 audio_thread_lock_merge = threading.Lock()
 audio_thread_lock_create = threading.Lock()
 audio_thread_lock_open = threading.Lock()
 audio_thread_lock_add_close = threading.Lock()
 audio_thread_lock_write = threading.Lock()
+
+def thread_wrapper(target, *args):
+    with thread_semaphore:
+        target(*args)
 
 def merge(memo1, memo2, memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time_merge, audio_trigger_interval, result_queue, audio_pipe):
     current_time = time.time()
@@ -16,7 +22,7 @@ def merge(memo1, memo2, memo_list, opened_memo, audio_done_event_merge, last_aud
             print('🥝 - Merge - Start Merge Command Recognition')
             last_audio_trigger_time_merge = current_time
             audio_done_event_merge.clear()
-            audio_thread = threading.Thread(target=audio_trigger_merge, args=(audio_pipe, result_queue, audio_done_event_merge))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_merge, audio_pipe, result_queue, audio_done_event_merge))
             audio_thread.start()
     if audio_done_event_merge.is_set():
         recognition_result = result_queue.get()
@@ -43,7 +49,7 @@ def create(position, audio_done_event_create, last_audio_trigger_time_create, au
             print('🍉 - Create - Start Create Command Recognition')
             last_audio_trigger_time_create = current_time
             audio_done_event_create.clear()
-            audio_thread = threading.Thread(target=audio_trigger_create, args=(audio_pipe, result_queue, audio_done_event_create))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_create, audio_pipe, result_queue, audio_done_event_create))
             audio_thread.start()
     return memo_new, audio_done_event_create, last_audio_trigger_time_create, result_queue
 
@@ -54,7 +60,7 @@ def open(opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_ti
             print('🍑 - Open - Start Open Command Recognition')
             last_audio_trigger_time_open = current_time
             audio_done_event_open.clear()
-            audio_thread = threading.Thread(target=audio_trigger_open, args=(audio_pipe, result_queue, audio_done_event_open))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_open, audio_pipe, result_queue, audio_done_event_open))
             audio_thread.start()
     if audio_done_event_open.is_set():
         recognition_result = result_queue.get()
@@ -71,7 +77,7 @@ def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_
             print('🫐🥑 - Add or Close - Start Command Recognition')
             last_audio_trigger_time_add_close = current_time
             audio_done_event_add_close.clear()
-            audio_thread = threading.Thread(target=audio_trigger_add, args=(audio_pipe, result_queue, audio_done_event_add_close))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_add, audio_pipe, result_queue, audio_done_event_add_close))
             audio_thread.start()
     if audio_done_event_add_close.is_set():
         recognition_result = result_queue.get()
@@ -91,7 +97,7 @@ def write(memo, audio_done_event_write, last_audio_trigger_time_write, audio_tri
             print('🥥 - Write - Start Write Command Recognition')
             last_audio_trigger_time_write = current_time
             audio_done_event_write.clear()
-            audio_thread = threading.Thread(target=audio_trigger_write, args=(audio_pipe, result_queue, audio_done_event_write))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_write, audio_pipe, result_queue, audio_done_event_write))
             audio_thread.start()
     if audio_done_event_write.is_set():
         recognition_result = result_queue.get()
