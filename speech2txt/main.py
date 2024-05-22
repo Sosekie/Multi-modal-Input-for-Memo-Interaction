@@ -5,7 +5,7 @@ from datetime import datetime
 
 def audio_trigger_merge(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 2)
+    byte_io = record(duration = 3)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -19,7 +19,7 @@ def audio_trigger_merge(pipe, result_queue, done_event):
 
 def audio_trigger_create(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 2)
+    byte_io = record(duration = 3)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -33,7 +33,7 @@ def audio_trigger_create(pipe, result_queue, done_event):
 
 def audio_trigger_open(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 2)
+    byte_io = record(duration = 3)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -47,7 +47,7 @@ def audio_trigger_open(pipe, result_queue, done_event):
 
 def audio_trigger_add(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 2)
+    byte_io = record(duration = 3)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
@@ -64,7 +64,7 @@ def audio_trigger_add(pipe, result_queue, done_event):
 
 def audio_trigger_write(pipe, result_queue, done_event):
     start_time = datetime.now()
-    byte_io = record(duration = 5)
+    byte_io = record(duration = 10)
     # print(f"record time: {(datetime.now() - start_time).total_seconds()} seconds")
     text = speech2txt(pipe, sample=byte_io.read())
     # print(f"to text time: {(datetime.now() - start_time).total_seconds()} seconds")
