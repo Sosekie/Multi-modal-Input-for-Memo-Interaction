@@ -20,8 +20,8 @@ def start(memo_list, audio_pipe):
 
     cap = cv2.VideoCapture(0)
     # threading event here
-    audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
-    result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
+    audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write, audio_done_event_close = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
+    result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write, result_queue_close = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
     last_audio_trigger_time = 0
     audio_trigger_interval = 3
 
@@ -69,7 +69,7 @@ def start(memo_list, audio_pipe):
                     # Merge memo
                     triggered_memo_list = get_triggered_memo_list(memo_list, hand_landmarks_list, frame, max_triggered=2)
                     if len(triggered_memo_list) >= 2:
-                        memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge)
+                        memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, result_queue_merge = merge(triggered_memo_list[0], triggered_memo_list[1], memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_pipe)
 
                     for idx in range(len(hand_landmarks_list)):
                         hand_landmarks = hand_landmarks_list[idx]
@@ -92,12 +92,12 @@ def start(memo_list, audio_pipe):
                                         # add
                                         opened_memo, audio_done_event_add, last_audio_trigger_time, result_queue_add = add_close(
                                             opened_memo, pinched_memo, audio_done_event_add, last_audio_trigger_time, audio_trigger_interval,
-                                            result_queue_add)
+                                            result_queue_add, audio_pipe)
                                 else:
                                     # open
                                     opened_memo, audio_done_event_open, last_audio_trigger_time, result_queue_open = open(
                                         opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_time, audio_trigger_interval,
-                                        result_queue_open)
+                                        result_queue_open, audio_pipe)
                                     
                             else:
                                 # catch and move memo
@@ -110,7 +110,8 @@ def start(memo_list, audio_pipe):
                                 # create a new memo
                                 else:
                                     memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create = \
-                                        create(pinch_position, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_done_event_create)
+                                        create(pinch_position, audio_done_event_create, last_audio_trigger_time,
+                                               audio_trigger_interval, result_queue_create, audio_pipe)
                         elif pinched_memo is not None:
                             # merge memo automatically
                             for memo in memo_list[::-1]:
