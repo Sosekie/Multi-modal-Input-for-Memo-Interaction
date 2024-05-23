@@ -4,10 +4,8 @@ from .similarity import *
 import time
 from datetime import datetime
 
-def audio_trigger_merge(pipe, result_queue, done_event):
-    start_time = datetime.now()
+def audio_trigger_merge(result_queue, done_event):
     byte_io = record(duration = 1)
-    # text = speech2txt(pipe, sample=byte_io.read())
     audio_path2 = 'speech2txt/Recording/merge.wav'
     simimarity = similarity(byte_io, audio_path2)
     print('🥝 - 🎼 - Merge: ', simimarity)
@@ -17,7 +15,7 @@ def audio_trigger_merge(pipe, result_queue, done_event):
     done_event.set()
 
 
-def audio_trigger_create(pipe, result_queue, done_event):
+def audio_trigger_create(result_queue, done_event):
     byte_io = record(duration=1)
     audio_path2 = 'speech2txt/Recording/create.wav'
     simimarity = similarity(byte_io, audio_path2)
@@ -27,12 +25,11 @@ def audio_trigger_create(pipe, result_queue, done_event):
     else:
         result_queue.put(False)
     done_event.set()
+    print('done_event.is_set(): ', done_event.is_set())
 
 
-def audio_trigger_open(pipe, result_queue, done_event):
-    start_time = datetime.now()
+def audio_trigger_open(result_queue, done_event):
     byte_io = record(duration = 1)
-    # text = speech2txt(pipe, sample=byte_io.read())
     audio_path2 = 'speech2txt/Recording/open.wav'
     simimarity = similarity(byte_io, audio_path2)
     print('🍑 - 🎼 - Open: ', simimarity)
@@ -42,7 +39,7 @@ def audio_trigger_open(pipe, result_queue, done_event):
     done_event.set()
     
 
-def audio_trigger_add(pipe, result_queue, done_event):
+def audio_trigger_add(result_queue, done_event):
     byte_io = record(duration=1)
     byte_io.seek(0)
     audio_path2_add = 'speech2txt/Recording/add.wav'
@@ -63,7 +60,6 @@ def audio_trigger_add(pipe, result_queue, done_event):
     done_event.set()
 
 def audio_trigger_write(pipe, result_queue, done_event):
-    start_time = datetime.now()
     byte_io = record(duration = 5)
     text = speech2txt(pipe, sample=byte_io.read())
     print('🥥 - 👣 - Write: ', text)

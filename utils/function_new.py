@@ -3,7 +3,7 @@ import time
 from gesture.main import *
 from speech2txt.main import *
 
-def merge(memo1, memo2, memo_list, opened_memo, last_audio_trigger_time, audio_trigger_interval, result_queue_merge, audio_done_event_merge):
+def merge(memo1, memo2, memo_list, opened_memo, audio_done_event_merge, last_audio_trigger_time, audio_trigger_interval, result_queue_merge):
     current_time = time.time()
     if not audio_done_event_merge.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
         print('🥝 - Merge - Start Merge Command Recognition')
@@ -24,7 +24,9 @@ def merge(memo1, memo2, memo_list, opened_memo, last_audio_trigger_time, audio_t
 def create(position, last_audio_trigger_time, audio_trigger_interval, result_queue_create, audio_done_event_create):
     current_time = time.time()
     memo_new = None
+    print('audio_done_event_create.is_set(): ', audio_done_event_create.is_set())
     if audio_done_event_create.is_set():
+        print('hello')
         recognition_result = result_queue_create.get()
         if recognition_result:
             print('🍉 - Create - Using Create Command to Create Memo')
@@ -35,9 +37,9 @@ def create(position, last_audio_trigger_time, audio_trigger_interval, result_que
         audio_trigger_create(result_queue_create, audio_done_event_create)
         last_audio_trigger_time = current_time
         audio_done_event_create.clear()
-    return memo_new, audio_done_event_create, last_audio_trigger_time, result_queue_create
+    return memo_new, last_audio_trigger_time
 
-def open(opened_memo, pinched_memo, last_audio_trigger_time, audio_trigger_interval, result_queue_open, audio_done_event_open):
+def open(opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_time, audio_trigger_interval, result_queue_open):
     current_time = time.time()
     if not audio_done_event_open.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
         print('🍑 - Open - Start Open Command Recognition')
@@ -52,7 +54,7 @@ def open(opened_memo, pinched_memo, last_audio_trigger_time, audio_trigger_inter
         audio_done_event_open.clear()
     return opened_memo, last_audio_trigger_time
 
-def add_close(opened_memo, memo, last_audio_trigger_time, audio_trigger_interval, result_queue_add_close, audio_done_event_add_close):
+def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_time, audio_trigger_interval, result_queue_add_close):
     current_time = time.time()
     if not audio_done_event_add_close.is_set() and (current_time - last_audio_trigger_time > audio_trigger_interval):
         print('🫐🥑 - Add or Close - Start Command Recognition')
@@ -70,7 +72,7 @@ def add_close(opened_memo, memo, last_audio_trigger_time, audio_trigger_interval
         audio_done_event_add_close.clear()
     return opened_memo, last_audio_trigger_time
 
-def write(memo, audio_pipe, last_audio_trigger_time, audio_trigger_interval, result_queue_write, audio_done_event_write):
+def write(memo, audio_pipe, audio_done_event_write, last_audio_trigger_time, audio_trigger_interval, result_queue_write):
     if audio_trigger_interval > 10:
         audio_trigger_interval = 10
     current_time = time.time()
