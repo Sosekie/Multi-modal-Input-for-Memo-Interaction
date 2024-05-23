@@ -20,10 +20,12 @@ def start(memo_list, audio_pipe):
 
     cap = cv2.VideoCapture(0)
     # threading event here
-    audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write, audio_done_event_close = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
-    result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write, result_queue_close = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
+    audio_done_event_merge, audio_done_event_create, audio_done_event_open, audio_done_event_add, audio_done_event_write = threading.Event(), threading.Event(), threading.Event(), threading.Event(), threading.Event()
+    result_queue_merge, result_queue_create, result_queue_open, result_queue_add, result_queue_write = queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue(), queue.Queue()
     last_audio_trigger_time = 0
     audio_trigger_interval = 3
+    last_audio_trigger_time_write = 0
+    write_trigger_interval = 10
 
     # Create a hand landmarker instance with the live stream mode
     base_options = python.BaseOptions(model_asset_path='./gesture/hand_landmarker.task')
@@ -85,8 +87,8 @@ def start(memo_list, audio_pipe):
                                 if pinched_memo == opened_memo:
                                     if pinched_memo.is_added:
                                         # write
-                                        audio_done_event_write, last_audio_trigger_time, result_queue_write = write(
-                                            pinched_memo, audio_done_event_write, last_audio_trigger_time, audio_trigger_interval,
+                                        audio_done_event_write, last_audio_trigger_time_write, result_queue_write = write(
+                                            pinched_memo, audio_done_event_write, last_audio_trigger_time_write, write_trigger_interval,
                                             result_queue_write, audio_pipe)
                                     else:
                                         # add

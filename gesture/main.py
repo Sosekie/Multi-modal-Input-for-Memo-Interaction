@@ -31,6 +31,7 @@ class Memo:
         self.font_thickness = 2
 
         self.is_added = False
+        self.is_finished = False
 
         self.update_pic()
 

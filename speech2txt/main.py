@@ -11,7 +11,7 @@ def audio_trigger_merge(pipe, result_queue, done_event):
     audio_path2 = 'speech2txt/Recording/merge.wav'
     simimarity = similarity(byte_io, audio_path2)
     print('🥝 - 🎼 - Merge: ', simimarity)
-    if simimarity > 0.5:
+    if simimarity > 0.93:
         result_queue.put(True)
     result_queue.put(False)
     done_event.set()
@@ -20,9 +20,10 @@ def audio_trigger_merge(pipe, result_queue, done_event):
 def audio_trigger_create(pipe, result_queue, done_event):
     byte_io = record(duration=1)
     audio_path2 = 'speech2txt/Recording/create.wav'
+    print("🎵 - Saving...")
     simimarity = similarity(byte_io, audio_path2)
     print('🍉 - 🎼 - Create: ', simimarity)
-    if simimarity > 0.5:
+    if simimarity > 0.92:
         result_queue.put(True)
     else:
         result_queue.put(False)
@@ -36,13 +37,13 @@ def audio_trigger_open(pipe, result_queue, done_event):
     audio_path2 = 'speech2txt/Recording/open.wav'
     simimarity = similarity(byte_io, audio_path2)
     print('🍑 - 🎼 - Open: ', simimarity)
-    if simimarity > 0.5:
+    if simimarity > 0.93:
         result_queue.put(True)
     result_queue.put(False)
     done_event.set()
     
 
-def audio_trigger_add(pipe, result_queue, done_event):
+def audio_trigger_add(pipe, result_queue, done_event, memo):
     byte_io = record(duration=1)
     byte_io.seek(0)
     audio_path2_add = 'speech2txt/Recording/add.wav'
@@ -53,12 +54,12 @@ def audio_trigger_add(pipe, result_queue, done_event):
     
     print('🫐 - 🎼 - Add: ', similarity_add,' - 🎼 - Close: ', similarity_close)
     
-    if similarity_add > 0.5 and similarity_add-0.2 > similarity_close:
+    if similarity_add > 0.93 and similarity_add > similarity_close and not memo.is_finished:
         result_queue.put(1)
-    elif similarity_close > 0.5 and similarity_close > similarity_add-0.2:
+    elif similarity_close > 0.85:
         result_queue.put(2)
     else:
-        result_queue.put(0)
+        result_queue.put(3)
     
     done_event.set()
 

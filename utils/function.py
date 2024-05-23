@@ -77,7 +77,7 @@ def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_
             print('🫐🥑 - Add or Close - Start Command Recognition')
             last_audio_trigger_time_add_close = current_time
             audio_done_event_add_close.clear()
-            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_add, audio_pipe, result_queue, audio_done_event_add_close))
+            audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_add, audio_pipe, result_queue, audio_done_event_add_close, memo))
             audio_thread.start()
     if audio_done_event_add_close.is_set():
         recognition_result = result_queue.get()
@@ -87,14 +87,15 @@ def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_
         elif recognition_result == 2:
             print('🥑 - Close - Close Memo')
             opened_memo = None
+            memo.is_finished = False
+        else:
+            memo.is_finished = False
         audio_done_event_add_close.clear()
     return opened_memo, audio_done_event_add_close, last_audio_trigger_time_add_close, result_queue
 
-def write(memo, audio_done_event_write, last_audio_trigger_time_write, audio_trigger_interval, result_queue, audio_pipe):
-    if audio_trigger_interval>10:
-        audio_trigger_interval = 10
+def write(memo, audio_done_event_write, last_audio_trigger_time_write, write_trigger_interval, result_queue, audio_pipe):
     current_time = time.time()
-    if not audio_done_event_write.is_set() and (current_time - last_audio_trigger_time_write > audio_trigger_interval):
+    if not audio_done_event_write.is_set() and (current_time - last_audio_trigger_time_write > write_trigger_interval):
         with audio_thread_lock_write:
             print('🥥 - Write - Start Write Command Recognition')
             last_audio_trigger_time_write = current_time
@@ -107,5 +108,6 @@ def write(memo, audio_done_event_write, last_audio_trigger_time_write, audio_tri
             print('🥥 - Write - Writing Memo...')
             memo.update_content(recognition_result)
             memo.update_added(False)
+            memo.is_finished = True
         audio_done_event_write.clear()
     return audio_done_event_write, last_audio_trigger_time_write, result_queue
