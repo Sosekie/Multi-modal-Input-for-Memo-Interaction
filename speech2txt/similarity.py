@@ -19,7 +19,7 @@ def extract_mfcc_torchaudio(audio_data, sample_rate, n_mfcc=6):
     return mfcc.mean(dim=2).squeeze().numpy()
 
 def calculate_similarity(mfcc1, mfcc2):
-    return 1 - cosine(mfcc1, mfcc2)
+    return cosine(mfcc1, mfcc2)
 
 def similarity(audio_data1, audio_path2, target_sr=16000, n_mfcc=6):
     start_time = time.time()
