@@ -157,7 +157,7 @@ def result_callback(result: vision.HandLandmarkerResult, output_image: mp.Image,
 
 if __name__ == "__main__":
     # initialize
-    model_id = ["openai/whisper-tiny", "openai/whisper-base", "openai/whisper-large-v3"]
+    model_id = ["openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
     memo1 = Memo([100, 100], content="A")
     memo_list = [memo1]

@@ -7,8 +7,8 @@ def model_initialize(model_id):
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
-        model_id, torch_dtype=torch_dtype, 
-        low_cpu_mem_usage=True, 
+        model_id, torch_dtype=torch_dtype,
+        low_cpu_mem_usage=True,
         use_safetensors=True
     )
     model.to(device)
@@ -27,14 +27,16 @@ def model_initialize(model_id):
     )
     return pipe
 
-
 def speech2txt(pipe, sample):
-    result = pipe(sample,
-                # optional:
-                generate_kwargs={
-                    "language": "english",
-                    #   "task": "translate"
-                    },
-                )
-    # print(result["text"])
-    return result["text"]
+    result = pipe(
+        sample,
+        generate_kwargs={
+            "language": "english",
+            "task": "transcribe"
+        },
+    )
+    if "text" in result:
+        return result["text"]
+    else:
+        print("Error: No text found in the result.")
+        return None
