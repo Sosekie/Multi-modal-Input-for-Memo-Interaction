@@ -27,7 +27,7 @@ def audio_trigger_create(pipe, result_queue, done_event):
     simimarity = similarity(byte_io, audio_path2)
     noise_simimarity = similarity(byte_io, noise_path2)
     print('🍉 - 🎼 - Create: ', simimarity, ' - Noise: ', noise_simimarity)
-    if simimarity > 0.10 and noise_simimarity < 0.02:
+    if simimarity > 0.09 and noise_simimarity < 0.023:
         result_queue.put(True)
     else:
         result_queue.put(False)
@@ -42,7 +42,7 @@ def audio_trigger_open(pipe, result_queue, done_event):
     simimarity = similarity(byte_io, audio_path2)
     noise_simimarity = similarity(byte_io, noise_path2)
     print('🍑 - 🎼 - Open: ', simimarity, ' - Noise: ', noise_simimarity)
-    if simimarity > 0.06 and noise_simimarity < 0.02:
+    if simimarity > 0.05 and noise_simimarity < 0.023:
         result_queue.put(True)
     result_queue.put(False)
     done_event.set()
