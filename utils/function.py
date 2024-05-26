@@ -88,8 +88,6 @@ def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_
             print('🥑 - Close - Close Memo')
             opened_memo = None
             memo.is_finished = False
-        else:
-            memo.is_finished = False
         audio_done_event_add_close.clear()
     return opened_memo, audio_done_event_add_close, last_audio_trigger_time_add_close, result_queue
 

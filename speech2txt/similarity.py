@@ -16,7 +16,14 @@ def extract_mfcc_torchaudio(audio_data, sample_rate, n_mfcc=6):
         melkwargs={"n_fft": 400, "hop_length": 160, "n_mels": 40, "center": False}
     )
     mfcc = mfcc_transform(waveform)
-    return mfcc.mean(dim=2).squeeze().numpy()
+    mfcc = mfcc.mean(dim=2).squeeze().numpy()
+    
+    # Normalize MFCC features (mean normalization)
+    mfcc_mean = np.mean(mfcc)
+    mfcc_std = np.std(mfcc)
+    mfcc_normalized = (mfcc - mfcc_mean) / mfcc_std
+
+    return mfcc_normalized
 
 def calculate_similarity(mfcc1, mfcc2):
     return cosine(mfcc1, mfcc2)

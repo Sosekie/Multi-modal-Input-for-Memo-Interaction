@@ -7,7 +7,7 @@ CHANNELS = 1  # 单声道
 RATE = 44100  # 采样率
 CHUNK = 1024  # 每次读取的帧数
 RECORD_SECONDS = 2  # 录音时间（秒）
-OUTPUT_FILENAME = "speech2txt/Recording/close.wav"  # 输出文件名
+OUTPUT_FILENAME = "speech2txt/Recording/noise.wav"  # 输出文件名
 
 # 创建PyAudio对象
 audio = pyaudio.PyAudio()

@@ -121,7 +121,7 @@ def start(memo_list, audio_pipe):
                                     pinched_memo.merge(memo)
                                     memo_list.remove(memo)
                                     if memo in pinched_memo_list:
-                                        pinched_memo_list[(idx+1)%2] = None
+                                        pinched_memo_list[(handedness_idx+1)%2] = None
                                     if memo == opened_memo:
                                         opened_memo = pinched_memo
                                     break
