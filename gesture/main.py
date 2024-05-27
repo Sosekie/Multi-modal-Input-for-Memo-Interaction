@@ -83,6 +83,9 @@ class Memo:
                     return True
         return False
 
+    def get_position(self):
+        return self.position
+
     # Update position function
     def update_position(self, new_pos):
         if distance.euclidean(self.position, new_pos) < self.size:

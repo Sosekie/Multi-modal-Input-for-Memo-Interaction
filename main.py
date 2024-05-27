@@ -125,7 +125,20 @@ def start(memo_list, audio_pipe):
                                     if memo == opened_memo:
                                         opened_memo = pinched_memo
                                     break
+
+                            # remove memo when it is inside the red area
+                            pinched_memo_x, pinched_memo_y = pinched_memo.get_position()
+                            if pinched_memo_x < 100:
+                                memo_list.remove(pinched_memo)
+                                if pinched_memo == opened_memo:
+                                    opened_memo = None
+
                             pinched_memo_list[handedness_idx] = None
+
+                # create delete area
+                overlay = frame.copy()
+                cv2.rectangle(overlay, (0, 0), (100, frame.shape[0]), (0, 0, 255), -1)
+                cv2.addWeighted(overlay, 0.5, frame, 0.5, 0, frame)
 
                 if memo_new is not None:
                     memo_list.append(memo_new)
@@ -159,7 +172,7 @@ if __name__ == "__main__":
     # initialize
     model_id = ["openai/whisper-base", "openai/whisper-large-v3"]
     audio_pipe = model_initialize(model_id[0])
-    memo1 = Memo([100, 100], content="A")
+    memo1 = Memo([200, 100], content="A")
     memo_list = [memo1]
 
     start(memo_list, audio_pipe)
