@@ -27,7 +27,7 @@ def merge(memo1, memo2, memo_list, opened_memo, audio_done_event_merge, last_aud
     if audio_done_event_merge.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
-            print('🥝 - Merge - Using Merge Command to Merge Memo')
+            # print('🥝 - Merge - Using Merge Command to Merge Memo')
             memo1.merge(memo2)
             memo_list.remove(memo2)
             if memo2 == opened_memo:
@@ -46,7 +46,7 @@ def create(position, audio_done_event_create, last_audio_trigger_time_create, au
         audio_done_event_create.clear()
     elif not audio_done_event_create.is_set() and (current_time - last_audio_trigger_time_create > audio_trigger_interval):
         with audio_thread_lock_create:
-            print('🍉 - Create - Start Create Command Recognition')
+            # print('🍉 - Create - Start Create Command Recognition')
             last_audio_trigger_time_create = current_time
             audio_done_event_create.clear()
             audio_thread = threading.Thread(target=thread_wrapper, args=(audio_trigger_create, audio_pipe, result_queue, audio_done_event_create))
@@ -65,7 +65,7 @@ def open(opened_memo, pinched_memo, audio_done_event_open, last_audio_trigger_ti
     if audio_done_event_open.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
-            print('🍑 - Open - Open Memo')
+            # print('🍑 - Open - Open Memo')
             opened_memo = pinched_memo
         audio_done_event_open.clear()
     return opened_memo, audio_done_event_open, last_audio_trigger_time_open, result_queue
@@ -82,10 +82,10 @@ def add_close(opened_memo, memo, audio_done_event_add_close, last_audio_trigger_
     if audio_done_event_add_close.is_set():
         recognition_result = result_queue.get()
         if recognition_result == 1 and not memo.is_added:
-            print('🫐 - Add - Now You Can Speak Your Memo Content')
+            # print('🫐 - Add - Now You Can Speak Your Memo Content')
             memo.update_added(True)
         elif recognition_result == 2:
-            print('🥑 - Close - Close Memo')
+            # print('🥑 - Close - Close Memo')
             opened_memo = None
             memo.is_finished = False
         audio_done_event_add_close.clear()
@@ -103,7 +103,7 @@ def write(memo, audio_done_event_write, last_audio_trigger_time_write, write_tri
     if audio_done_event_write.is_set():
         recognition_result = result_queue.get()
         if recognition_result:
-            print('🥥 - Write - Writing Memo...')
+            # print('🥥 - Write - Writing Memo...')
             memo.update_content(recognition_result)
             memo.update_added(False)
             memo.is_finished = True

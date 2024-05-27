@@ -33,29 +33,29 @@ def similarity(audio_data1, audio_path2, target_sr=16000, n_mfcc=6):
     
     audio_data1.seek(0)
     
-    print("🎵 - Load and resample audio1...")
+    # print("🎵 - Load and resample audio1...")
     y1, sr1 = sf.read(audio_data1)
     if sr1 != target_sr:
         y1 = torch.tensor(y1, dtype=torch.float32)
         y1 = torchaudio.transforms.Resample(orig_freq=sr1, new_freq=target_sr)(y1.unsqueeze(0)).squeeze().numpy()
-    print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
+    # print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
     
-    print("🎵 - Load and resample audio2...")
+    # print("🎵 - Load and resample audio2...")
     start_time = time.time()
     y2, sr2 = torchaudio.load(audio_path2)
     if sr2 != target_sr:
         y2 = torchaudio.transforms.Resample(orig_freq=sr2, new_freq=target_sr)(y2).squeeze().numpy()
-    print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
+    # print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
     
-    print("🎵 - Extract MFCC features...")
+    # print("🎵 - Extract MFCC features...")
     start_time = time.time()
     mfcc1 = extract_mfcc_torchaudio(y1, target_sr, n_mfcc)
     mfcc2 = extract_mfcc_torchaudio(y2, target_sr, n_mfcc)
-    print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
+    # print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
     
-    print("🎵 - Calculate similarity...")
+    # print("🎵 - Calculate similarity...")
     start_time = time.time()
     similarity_score = calculate_similarity(mfcc1, mfcc2)
-    print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
+    # print(f"Time elapsed: {time.time() - start_time:.2f} seconds")
     
     return similarity_score
