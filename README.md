@@ -1,19 +1,11 @@
 # MMUI_project
-## Already done:
-- Implement Merge speech recognition, speech trigger.
-- Implement a Virtual Memo from the Speech (create a new memo).
+## The system is capable of
+- Implement a Virtual Memo with speech and gesture (create a new memo).
 - Catch the memo by the gesture
+- Merge 2 memos using multimodality
+- Merge 2 memos using only gesture
 - Open the memo on a new window
 - Templete evaluation survey: https://docs.google.com/forms/d/e/1FAIpQLScNHHTZhl1JdlbPnvrYLgjG7TIuZC6hA3dre9IEgac6i2ZWVQ/viewform?usp=sharing
-
-## Next steps:
-
-Priority:
-- Add text to memo by speech
-- Improve catch memo function (don't overlap 2 memos while catching)
-- Merge memos togheter by gesture
-- Upgrading the speech part for the Merge (merge the red one, or the green) (merge the red one on the green one)
-- Add some Interfaces on the screeen (see which function is ON/OFF)
 
 How to add text:
 - catch a memo
@@ -23,15 +15,12 @@ How to add text:
 - say stop
 - say close
 
-## Evaluation statistics about (still to choose):
+## Evaluation statistics about:
 - response time of functions
-- how much time it takes to move a memo from a specific point to another
+- quality recognition of gesture and gesture
 - better do the merge with the speech or catching 2 memos togheter
-- percentage of the correct speech text on the memo said
-- how much time it takes to recognize correctly the speech command
-- confront the speed text writing between keyboard typing and speech talk
-- confront speed merging between our modalities and the copy paste mouse/keyboard modality
-- Using as references System Usability Scale (SUS) or Usability Metric for User Experience (UMUX)
+- preference between this Virtual Memo System or typing the letters on the keyboard by hand
+- Using Usability Metric for User Experience (UMUX)
 
 ## Environment
 
