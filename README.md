@@ -1,4 +1,9 @@
 # MMUI_project
+
+## Report
+
+[MI-Memo: Multi-modal Input for Interactive Memo](https://github.com/Sosekie/Multi-modal-Input-for-Memo-Interaction/blob/main/Multi-modal%20Input%20for%20Interactive%20Memo.pdf)
+
 ## The system is capable of
 - Implement a Virtual Memo with speech and gesture (create a new memo).
 - Catch the memo by the gesture
